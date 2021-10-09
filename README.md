@@ -25,9 +25,7 @@ create a file called diplo.json and put the following code in there
 
 ## Dependencies
 
-Dependencies allow putting all your dependencies into one json file it also supports making [import maps](https://deno.land/manual@v1.14.3/npm_nodejs/import_maps#overriding-imports)
-
-You can now import the dependencies from .diplo/deps.ts
+If you add dependencies object to the diplo.json file diplo will automatically create a file called deps.ts inside the .diplo folder.
 
 ```json
 {
@@ -40,7 +38,13 @@ You can now import the dependencies from .diplo/deps.ts
 
 for import map support
 
-- note Diplo will automatically append `--import-map="./.diplo/import_map.json` after deno run.
+> This only works on javascript and will cause type error in typescript
+
+```js
+import * as server from 'server';
+```
+
+- note Diplo will automatically append `--import-map="./.diplo/import_map.json` after `deno run`.
 
 ```json
 {
