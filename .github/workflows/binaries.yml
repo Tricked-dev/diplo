@@ -1,4 +1,4 @@
-#https://github.com/imitari/imitari/blob/main/.github/workflows/binaries.yml
+#https://github.com/diplo/diplo/blob/main/.github/workflows/binaries.yml
 name: Rust
 
 on:
@@ -146,19 +146,19 @@ jobs:
         with:
           version: latest
           files: |
-            ${{ github.workspace }}\target\release\imitari.exe
-            ${{ github.workspace }}\target\${{ matrix.triple.target }}\release\imitari.exe
+            ${{ github.workspace }}\target\release\diplo.exe
+            ${{ github.workspace }}\target\${{ matrix.triple.target }}\release\diplo.exe
           args: --best --lzma
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: imitari-${{ matrix.triple.target }}
+          name: diplo-${{ matrix.triple.target }}
           path: |
-            ${{ github.workspace }}/target/release/imitari
-            ${{ github.workspace }}/target/${{ matrix.triple.target }}/release/imitari
-            ${{ github.workspace }}\target\release\imitari.exe
-            ${{ github.workspace }}\target\${{ matrix.triple.target }}\release\imitari.exe
+            ${{ github.workspace }}/target/release/diplo
+            ${{ github.workspace }}/target/${{ matrix.triple.target }}/release/diplo
+            ${{ github.workspace }}\target\release\diplo.exe
+            ${{ github.workspace }}\target\${{ matrix.triple.target }}\release\diplo.exe
 
 #removed tests for now because takes too long
 #  tests:
