@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"paths": {
+			"natico": "https://deno.land/x/natico/mod.ts"
+		}
+	},
+
+	"imports": {
+		"natico": "https://deno.land/x/natico/mod.ts"
+	}
+}

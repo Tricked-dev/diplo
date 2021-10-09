@@ -1,0 +1,12 @@
+{
+	"name": "",
+	"scripts": {
+		"test": "deno run --allow-write -A a.ts",
+		"build": "deno bundle a.ts"
+	},
+	"import_map": false,
+	"load_env": true,
+	"dependencies": {
+		"natico": "https://deno.land/x/natico/mod.ts"
+	}
+}
