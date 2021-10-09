@@ -1,5 +1,7 @@
 # Diplo <!-- omit in toc -->
 
+[![Rust](https://github.com/Tricked-dev/diplo/actions/workflows/binaries.yml/badge.svg)](https://github.com/Tricked-dev/diplo/actions/workflows/binaries.yml)
+
 Diplo is a deno script runner made in rust.
 
 - [Features](#features)

@@ -23,7 +23,7 @@ fn main() {
     let mut config: Config = Config {
         load_env: Some(false),
         import_map: Some(false),
-        name: Some("".to_string()),
+        name: None,
         scripts: Some(HashMap::new()),
         dependencies: Some(HashMap::new()),
     };
@@ -37,12 +37,15 @@ fn main() {
         .author(crate_authors!())
         .about(crate_description!())
         .subcommand(
-            App::new("run").about("run a script").arg(
+            App::new("run").about("Run a diplo script").arg(
                 Arg::new("script")
                     .about("The script to run defined in the diplo.json file")
                     .required(true),
             ),
         )
+        .subcommand(App::new("init").about(
+            "Initialize diplo this will create all files required to run scripts (not required)",
+        ))
         .get_matches();
 
     match matches.subcommand() {
@@ -70,7 +73,7 @@ fn main() {
                     }
                 }
 
-                if let Some(data) = config.scripts.unwrap().get(script) {
+                if let Some(data) = config.scripts.expect("PLEASE CREATE A \"scripts\" SECTION IN YOUR diplo.json TO USE THIS FEATURE").get(script) {
                     let mut tp = String::from("deno run ");
 
                     //Allow inserting the import-map and future things
@@ -96,7 +99,22 @@ fn main() {
                 )
             }
         } // clone was used
-
+        Some(("init", _)) => {
+            if let Some(dependencies) = config.dependencies {
+                create_deps(&dependencies);
+                if let Some(import_map) = config.import_map {
+                    if import_map == true {
+                        let imports = json!({ "imports": dependencies });
+                        write(
+                            format!("{}/import_map.json", &*DOTDIPLO),
+                            serde_json::to_string(&imports).unwrap(),
+                        )
+                        .unwrap();
+                    }
+                }
+            }
+            println!("Successfully initialized diplo")
+        }
         _ => println!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"), // commit was used                       // Either no subcommand or one not tested for...
     }
 }
