@@ -1,10 +1,10 @@
 pub mod update_deno;
 use lazy_static::lazy_static;
-use serde_json::Value;
+use serde_json::{json, Value};
 use std::{
     collections::HashMap,
     env,
-    fs::{create_dir_all, write},
+    fs::{create_dir_all, read_to_string, write},
 };
 
 lazy_static! {
@@ -31,5 +31,19 @@ pub fn merge(a: &mut Value, b: Value) {
             }
         }
         (a, b) => *a = b,
+    }
+}
+
+pub fn update_config(val: Value) -> bool {
+    let data = read_to_string(&*DIPLOJSON);
+    if let Ok(data) = data {
+        let mut config: Value = serde_json::from_str(&data).unwrap_or_else(|_| json!({}));
+        merge(&mut config, val);
+
+        write(&*DIPLOJSON, serde_json::to_string_pretty(&config).unwrap()).unwrap();
+        true
+    } else {
+        println!("No {} file found please create one", &*DIPLOJSON);
+        false
     }
 }

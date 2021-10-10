@@ -1,7 +1,7 @@
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg};
-use diplo::{create_deps, merge, update_deno::update_deps, DIPLOJSON, DOTDIPLO};
+use diplo::{create_deps, update_config, update_deno::update_deps, DIPLOJSON, DOTDIPLO};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::json;
 use std::{
     collections::HashMap,
     env,
@@ -29,12 +29,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         scripts: Some(HashMap::new()),
         dependencies: Some(HashMap::new()),
     };
-    let hasConfig: bool;
+    let has_config: bool;
     if let Ok(data) = data {
         config = serde_json::from_str(&data).unwrap();
-        hasConfig = true
+        has_config = true
     } else {
-        hasConfig = false
+        has_config = false
     }
 
     let matches = App::new(crate_name!())
@@ -60,7 +60,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // ),
         ).subcommand(App::new("init").about(
             "Initialize diplo",
-        ))
+        )  .arg(
+                    Arg::new("yes")
+                        .about("Accept all options")
+                        .required(false)
+                        .takes_value(false)
+                        .short('y')
+                        .long("yes"),
+                ),)
         .subcommand(App::new("install").about(
             "This creates the .diplo directory with all required files",
         )).subcommand(App::new("update").about(
@@ -119,36 +126,48 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
             }
         }
-        Some(("init", _)) => {
-            if hasConfig {
-                println!("WARNING THIS WILL OVERWRITE YOUR OLD {} FILE", &*DIPLOJSON)
+        Some(("init", sub_m)) => {
+            if sub_m.is_present("yes") {
+                let data = json!({
+                    "name": "diplo-project",
+                    "load_env":false,
+                    "import_map": false,
+                    "dependencies": {}
+                });
+                println!("Succesfully wrote changes to {}", &*DIPLOJSON);
+                fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+            } else {
+                if has_config {
+                    println!("WARNING THIS WILL OVERWRITE YOUR OLD {} FILE", &*DIPLOJSON)
+                }
+                let name = rprompt::prompt_reply_stderr("name : ").unwrap_or("".to_owned());
+                let env =
+                    rprompt::prompt_reply_stderr("load_env (false): ").unwrap_or("".to_owned());
+                let load_env: bool;
+                //TODO: FIX THIS MESSY CODE
+                if env.contains("true") {
+                    load_env = true
+                } else {
+                    load_env = false
+                };
+                let import =
+                    rprompt::prompt_reply_stderr("import_map (false): ").unwrap_or("".to_owned());
+                let import_map: bool;
+                //TODO: FIX THIS MESSY CODE
+                if import.contains("true") {
+                    import_map = true
+                } else {
+                    import_map = false
+                };
+                let data = json!({
+                    "name": name,
+                    "load_env":load_env,
+                    "import_map": import_map,
+                    "dependencies": {}
+                });
+                println!("Succesfully wrote changes to {}", &*DIPLOJSON);
+                fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
             }
-            let name = rprompt::prompt_reply_stderr("name : ").unwrap_or("".to_owned());
-            let env = rprompt::prompt_reply_stderr("load_env (false): ").unwrap_or("".to_owned());
-            let load_env: bool;
-            //TODO: FIX THIS MESSY CODE
-            if env.contains("true") {
-                load_env = true
-            } else {
-                load_env = false
-            };
-            let import =
-                rprompt::prompt_reply_stderr("import_map (false): ").unwrap_or("".to_owned());
-            let import_map: bool;
-            //TODO: FIX THIS MESSY CODE
-            if import.contains("true") {
-                import_map = true
-            } else {
-                import_map = false
-            };
-            let data = json!({
-                "name": name,
-                "load_env":load_env,
-                "import_map": import_map,
-                "dependencies": {}
-            });
-            println!("Succesfully wrote changes to {}", &*DIPLOJSON);
-            fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
         }
         Some(("install", _)) => {
             if let Some(dependencies) = config.dependencies {
@@ -168,14 +187,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Some(("update", _)) => {
             let newdeps = update_deps(&config.dependencies.unwrap()).await;
-            let data = read_to_string(&*DIPLOJSON);
-            if let Ok(data) = data {
-                let mut config: Value = serde_json::from_str(&data).unwrap();
-                merge(&mut config, json!({ "dependencies": &newdeps }));
-
-                fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&config).unwrap()).unwrap();
-                println!("updating done!")
+            if let true = update_config(json!({ "dependencies": &newdeps })) {
+                println!("updating done!");
             }
+
+            // let data = read_to_string(&*DIPLOJSON);
+            // if let Ok(data) = data {
+            //     let mut config: Value = serde_json::from_str(&data).unwrap();
+            //     merge(&mut config, json!({ "dependencies": &newdeps }));
+
+            //     fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&config).unwrap()).unwrap();
+            //     println!("updating done!")
+            // } else {
+            //     println!("No diplo.json file found");
+            // }
         }
         _ => println!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"), // commit was used                       // Either no subcommand or one not tested for...
     }
