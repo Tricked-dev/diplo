@@ -1,6 +1,6 @@
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg};
 use diplo::{
-    create_deps, update_config,
+    load_config::{create_deps, update_config},
     update_deno::{update_deps, Versions, HTTP_CLIENT},
     watcher::{get_config, DiploHandler},
     CONFIG, DIPLOJSON, DOTDIPLO,
