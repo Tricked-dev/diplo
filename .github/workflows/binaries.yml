@@ -119,6 +119,10 @@ jobs:
       - name: 'Enable caching'
         uses: Swatinem/rust-cache@v1.3.0
 
+      - name: Install Curl
+        if: matrix.triple.os == 'ubuntu-latest'
+        run: sudo apt install libcurl4-openssl-dev libssl-dev
+
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -139,10 +143,6 @@ jobs:
           command: build
           args: --target=${{ matrix.triple.target }} --manifest-path=Cargo.toml --all-features --release
           use-cross: ${{ matrix.triple.cross }}
-
-      - name: Install Curl
-        if: matrix.triple.os == 'ubuntu-latest'
-        run: sudo apt install libcurl4-openssl-dev libssl-dev
 
       - name: 'Compress executable via UPX (Windows MSVC)'
         if: matrix.triple.os == 'windows-latest'
