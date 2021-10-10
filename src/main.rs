@@ -10,7 +10,17 @@ use std::{
     collections::HashMap,
     env,
     fs::{self, read_to_string, write},
-    process::Command,
+    path::Path,
+    process::{Child, Command},
+    sync::{Arc, Mutex},
+};
+// use watchexec::config::ConfigBuilder;
+use watchexec::{
+    //ignore
+    config::{Config as WatchConfig, ConfigBuilder as WatchConfigBuilder},
+    error::Result as WatchResult,
+    pathop::PathOp,
+    run::{watch, ExecHandler, Handler, OnBusyUpdate},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -54,35 +64,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .required(true),
                 )
                 // TODO: add watch its way too hard to add with closures etc but maybe one day
-                // .arg(
-                //     Arg::new("watch")
-                //         .about("Watch the filesystem for changes and restart on changes")
-                //         .required(false)
-                //         .takes_value(false)
-                //         .short('w')
-                //         .long("watch"),
-                // ),
-        ).subcommand(App::new("init").about(
-            "Initialize diplo",
-        )  .arg(
-                    Arg::new("yes")
-                        .about("Accept all options")
+                .arg(
+                    Arg::new("watch")
+                        .about("Watch the filesystem for changes and restart on changes")
                         .required(false)
                         .takes_value(false)
-                        .short('y')
-                        .long("yes"),
-                ),)
-        .subcommand(App::new("install").about(
-            "This creates the .diplo directory with all required files",
-        )).subcommand(App::new("update").about(
-            "This updates all deno.land/x/ modules to their latest version",
-        )).subcommand(App::new("add").about(
-            "Add a deno.land/x/ module",
-        ).arg(
-                    Arg::new("module")
-                        .about("Deno module you want to add")
-                        .required(true),
-                ))
+                        .short('w')
+                        .long("watch"),
+                ),
+        )
+        .subcommand(
+            App::new("init").about("Initialize diplo").arg(
+                Arg::new("yes")
+                    .about("Accept all options")
+                    .required(false)
+                    .takes_value(false)
+                    .short('y')
+                    .long("yes"),
+            ),
+        )
+        .subcommand(
+            App::new("install").about("This creates the .diplo directory with all required files"),
+        )
+        .subcommand(
+            App::new("update")
+                .about("This updates all deno.land/x/ modules to their latest version"),
+        )
+        .subcommand(
+            App::new("add").about("Add a deno.land/x/ module").arg(
+                Arg::new("module")
+                    .about("Deno module you want to add")
+                    .required(true),
+            ),
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -124,10 +138,62 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     let args = parts;
 
-                    let mut out = Command::new(command).args(args).spawn().unwrap();
-                    if let Err(error) = out.wait() {
-                        println!("{}", error);
+                    if sub_m.is_present("watch") {
+                        let config = WatchConfigBuilder::default()
+                            .clear_screen(false)
+                            .run_initially(true)
+                            .paths(vec![".".into()])
+                            .cmd(vec![data_2.into()])
+                            .on_busy_update(OnBusyUpdate::Restart)
+                            .build()?;
+
+                        let handler = MyHandler(ExecHandler::new(config)?);
+                        watch(&handler).unwrap();
+                        // let command = Arc::new(Mutex::new(data_2));
+                        // // let args = Arc::new(Mutex::new(args));
+                        // let command_clone = command.clone();
+                        // let mut last: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
+                        // let mut last_clone = last.clone();
+                        // let mut watcher = notify::recommended_watcher(
+                        //     move |res: NotifyResult<notify::Event>| {
+                        //         println!("event");
+                        //         match res {
+                        //             Ok(event) => {
+                        //                 if event.kind.is_modify() {
+                        //                     if let Some(&mut last) = &*last_clone.lock().unwrap() {
+                        //                         last.kill();
+                        //                     }
+                        //                     println!("event");
+                        //                     let part = &*command_clone.lock().unwrap();
+
+                        //                     let mut parts = part.trim().split_whitespace();
+                        //                     let command = parts.next().unwrap();
+                        //                     let args = parts;
+
+                        //                     let mut out =
+                        //                         Command::new(command).args(args).spawn().unwrap();
+                        //                     last = Arc::new(Mutex::new(Some(out)));
+                        //                     if let Err(error) = out.wait() {
+                        //                         println!("{}", error);
+                        //                     }
+                        //                 }
+                        //             }
+                        //             Err(e) => println!("watch error: {:?}", e),
+                        //         }
+                        //     },
+                        // )?;
+
+                        // watcher.watch(Path::new("."), RecursiveMode::Recursive)?;
+                        // println!("ended");
+                        // loop {}
+                    } else {
+                        let mut out = Command::new(command).args(args).spawn().unwrap();
+
+                        if let Err(error) = out.wait() {
+                            println!("{}", error);
+                        }
                     }
+
                     return Ok(());
                 }
                 println!(
@@ -246,4 +312,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => println!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"), // commit was used                       // Either no subcommand or one not tested for...
     }
     Ok(())
+}
+
+struct MyHandler(ExecHandler);
+
+impl Handler for MyHandler {
+    fn args(&self) -> WatchConfig {
+        self.0.args()
+    }
+
+    fn on_manual(&self) -> WatchResult<bool> {
+        // println!("Running manually!");
+        self.0.on_manual()
+    }
+
+    fn on_update(&self, ops: &[PathOp]) -> WatchResult<bool> {
+        // println!("Running manually {:?}", ops);
+        println!("Noticed file change, restarting");
+        self.0.on_update(ops)
+    }
 }

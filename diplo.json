@@ -1,0 +1,9 @@
+{
+	"dependencies": {},
+	"scripts": {
+		"run": "deno run -A test.ts"
+	},
+	"import_map": false,
+	"load_env": false,
+	"name": ""
+}
