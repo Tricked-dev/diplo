@@ -6,6 +6,7 @@ Diplo is a [Deno](https://deno.land/) script runner made in rust.
 
 - [Installing](#installing)
 - [Features](#features)
+	- [File watching](#file-watching)
 	- [Easy dependencies](#easy-dependencies)
 	- [Script running](#script-running)
 	- [Dependencies](#dependencies)
@@ -15,12 +16,17 @@ Diplo is a [Deno](https://deno.land/) script runner made in rust.
 
 # Installing
 
-You can download diplo from the [releases tab](https://github.com/Tricked-dev/diplo/releases) or install it using cargo install diplo
+You can download diplo from the [releases tab](https://github.com/Tricked-dev/diplo/releases) or install it using `cargo install diplo`
 
 After that you can run `diplo init` for a interactive setup.  
 or use `diplo init -y` for a one command setup
 
 # Features
+
+## File watching
+
+Diplo can replace [Denon](https://github.com/denosaurs/denon) in terms of restarting on file change.  
+To restart a script on save you just have to append `--watch` to `diplo run <script>`
 
 ## Easy dependencies
 
