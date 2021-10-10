@@ -1,6 +1,6 @@
 [package]
 name = "diplo"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2018"
 description = "A script runner for deno made in rust™️"
 authors = ["Tricked-dev"]
@@ -14,7 +14,9 @@ homepage = "https://tricked.pro/diplo"
 clap = "3.0.0-beta.4"
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
-notify = "5.0.0-pre.13"
-crossbeam-channel = "0.4.0"
 serde = { version = "1.0.130", features = ["derive"] }
 serde_json = "1.0.68"
+reqwest = { version = "0.11.4", features = ["json", "gzip", "brotli"] }
+tokio = { version = "1.12.0", features = ["macros", "rt-multi-thread"] }
+regex = "1.5.4"
+rprompt = "1.0.5"

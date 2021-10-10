@@ -8,6 +8,7 @@ Diplo is a deno script runner made in rust.
 - [Features](#features)
 	- [Script running](#script-running)
 	- [Dependencies](#dependencies)
+		- [Updating Dependencies](#updating-dependencies)
 	- [Dotenv Support](#dotenv-support)
 	- [Example Config](#example-config)
 
@@ -19,9 +20,9 @@ You can download diplo from the [releases tab](https://github.com/Tricked-dev/di
 
 ## Script running
 
-create a file called diplo.json and put the following code in there
+You can easily create scripts like you do with npm and yarn
 
-after that you can do `diplo run start` or node
+if you want to run the script just do `diplo run start` to run the start script.
 
 ```json
 {
@@ -45,9 +46,13 @@ If you add dependencies object to the diplo.json file diplo will automatically c
 }
 ```
 
-for import map support
+### Updating Dependencies
 
-> This only works on javascript and will cause type error in typescript
+updating dependencies is a as simple as running `diplo update` note this will only update `deno.land/x/` packages
+
+### Import Map Support <!-- omit in toc -->
+
+> This only works on javascript and will cause type errors in typescript
 
 ```js
 import * as server from 'server';

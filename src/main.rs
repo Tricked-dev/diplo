@@ -1,11 +1,11 @@
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg};
-use diplo::{create_deps, DIPLOJSON, DOTDIPLO};
+use diplo::{create_deps, merge, update_deno::update_deps, DIPLOJSON, DOTDIPLO};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+use serde_json::{json, Value};
 use std::{
     collections::HashMap,
     env,
-    fs::{read_to_string, write},
+    fs::{self, read_to_string, write},
     process::Command,
 };
 
@@ -18,8 +18,10 @@ pub struct Config {
     dependencies: Option<HashMap<String, String>>,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let data = read_to_string(&*DIPLOJSON);
+
     let mut config: Config = Config {
         load_env: Some(false),
         import_map: Some(false),
@@ -27,9 +29,12 @@ fn main() {
         scripts: Some(HashMap::new()),
         dependencies: Some(HashMap::new()),
     };
-
+    let hasConfig: bool;
     if let Ok(data) = data {
         config = serde_json::from_str(&data).unwrap();
+        hasConfig = true
+    } else {
+        hasConfig = false
     }
 
     let matches = App::new(crate_name!())
@@ -53,9 +58,13 @@ fn main() {
                 //         .short('w')
                 //         .long("watch"),
                 // ),
-        )
-        .subcommand(App::new("init").about(
-            "Initialize diplo this will create all files required to run scripts (not required)",
+        ).subcommand(App::new("init").about(
+            "Initialize diplo",
+        ))
+        .subcommand(App::new("install").about(
+            "This creates the .diplo directory with all required files",
+        )).subcommand(App::new("update").about(
+            "This updates all deno.land/x/ modules to their latest version",
         ))
         .get_matches();
 
@@ -102,7 +111,7 @@ fn main() {
                     if let Err(error) = out.wait() {
                         println!("{}", error);
                     }
-                    return;
+                    return Ok(());
                 }
                 println!(
                     "Script not found please specify a script from the {} file",
@@ -111,6 +120,37 @@ fn main() {
             }
         }
         Some(("init", _)) => {
+            if hasConfig {
+                println!("WARNING THIS WILL OVERWRITE YOUR OLD {} FILE", &*DIPLOJSON)
+            }
+            let name = rprompt::prompt_reply_stderr("name : ").unwrap_or("".to_owned());
+            let env = rprompt::prompt_reply_stderr("load_env (false): ").unwrap_or("".to_owned());
+            let load_env: bool;
+            //TODO: FIX THIS MESSY CODE
+            if env.contains("true") {
+                load_env = true
+            } else {
+                load_env = false
+            };
+            let import =
+                rprompt::prompt_reply_stderr("import_map (false): ").unwrap_or("".to_owned());
+            let import_map: bool;
+            //TODO: FIX THIS MESSY CODE
+            if import.contains("true") {
+                import_map = true
+            } else {
+                import_map = false
+            };
+            let data = json!({
+                "name": name,
+                "load_env":load_env,
+                "import_map": import_map,
+                "dependencies": {}
+            });
+            println!("Succesfully wrote changes to {}", &*DIPLOJSON);
+            fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+        }
+        Some(("install", _)) => {
             if let Some(dependencies) = config.dependencies {
                 create_deps(&dependencies);
                 if let Some(import_map) = config.import_map {
@@ -126,6 +166,18 @@ fn main() {
             }
             println!("Successfully initialized diplo")
         }
+        Some(("update", _)) => {
+            let newdeps = update_deps(&config.dependencies.unwrap()).await;
+            let data = read_to_string(&*DIPLOJSON);
+            if let Ok(data) = data {
+                let mut config: Value = serde_json::from_str(&data).unwrap();
+                merge(&mut config, json!({ "dependencies": &newdeps }));
+
+                fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&config).unwrap()).unwrap();
+                println!("updating done!")
+            }
+        }
         _ => println!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"), // commit was used                       // Either no subcommand or one not tested for...
     }
+    Ok(())
 }

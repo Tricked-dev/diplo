@@ -1,4 +1,6 @@
+pub mod update_deno;
 use lazy_static::lazy_static;
+use serde_json::Value;
 use std::{
     collections::HashMap,
     env,
@@ -18,4 +20,16 @@ pub fn create_deps(dependencies: &HashMap<String, String>) {
         data.push(format!("export * from \"{}\"", value))
     }
     write(format!("{}/deps.ts", &*DOTDIPLO), data.join("\n")).unwrap()
+}
+
+pub fn merge(a: &mut Value, b: Value) {
+    match (a, b) {
+        (a @ &mut Value::Object(_), Value::Object(b)) => {
+            let a = a.as_object_mut().unwrap();
+            for (k, v) in b {
+                merge(a.entry(k).or_insert(Value::Null), v);
+            }
+        }
+        (a, b) => *a = b,
+    }
 }
