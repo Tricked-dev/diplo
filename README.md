@@ -4,17 +4,24 @@
 
 Diplo is a deno script runner made in rust.
 
+- [Installing](#installing)
 - [Features](#features)
-  - [Script running](#script-running)
-  - [Dependencies](#dependencies)
-  - [Dotenv Support](#dotenv-support)
-  - [Example Config](#example-config)
+	- [Script running](#script-running)
+	- [Dependencies](#dependencies)
+	- [Dotenv Support](#dotenv-support)
+	- [Example Config](#example-config)
+
+# Installing
+
+You can download diplo from the [releases tab](https://github.com/Tricked-dev/diplo/releases) or install it using cargo install diplo
 
 # Features
 
 ## Script running
 
 create a file called diplo.json and put the following code in there
+
+after that you can do `diplo run start` or node
 
 ```json
 {

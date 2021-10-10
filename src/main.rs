@@ -37,11 +37,22 @@ fn main() {
         .author(crate_authors!())
         .about(crate_description!())
         .subcommand(
-            App::new("run").about("Run a diplo script").arg(
-                Arg::new("script")
-                    .about("The script to run defined in the diplo.json file")
-                    .required(true),
-            ),
+            App::new("run")
+                .about("Run a diplo script")
+                .arg(
+                    Arg::new("script")
+                        .about("The script to run defined in the diplo.json file")
+                        .required(true),
+                )
+                // TODO: add watch its way too hard to add with closures etc but maybe one day
+                // .arg(
+                //     Arg::new("watch")
+                //         .about("Watch the filesystem for changes and restart on changes")
+                //         .required(false)
+                //         .takes_value(false)
+                //         .short('w')
+                //         .long("watch"),
+                // ),
         )
         .subcommand(App::new("init").about(
             "Initialize diplo this will create all files required to run scripts (not required)",
@@ -56,7 +67,7 @@ fn main() {
                 if let Some(dependencies) = config.dependencies {
                     create_deps(&dependencies);
                     if let Some(import_map) = config.import_map {
-                        if import_map == true {
+                        if import_map {
                             let imports = json!({ "imports": dependencies });
                             write(
                                 format!("{}/import_map.json", &*DOTDIPLO),
@@ -68,12 +79,12 @@ fn main() {
                     }
                 }
                 if let Some(load_env) = config.load_env {
-                    if load_env == true {
+                    if load_env {
                         dotenv::dotenv().expect("COULD NOT FIND .env FILE IN CURRENT DIRECTORY");
                     }
                 }
 
-                if let Some(data) = config.scripts.expect("PLEASE CREATE A \"scripts\" SECTION IN YOUR diplo.json TO USE THIS FEATURE").get(script) {
+                if let Some(data) = config.scripts.unwrap().get(script) {
                     let mut tp = String::from("deno run ");
 
                     //Allow inserting the import-map and future things
@@ -98,12 +109,12 @@ fn main() {
                     &*DIPLOJSON
                 )
             }
-        } // clone was used
+        }
         Some(("init", _)) => {
             if let Some(dependencies) = config.dependencies {
                 create_deps(&dependencies);
                 if let Some(import_map) = config.import_map {
-                    if import_map == true {
+                    if import_map {
                         let imports = json!({ "imports": dependencies });
                         write(
                             format!("{}/import_map.json", &*DOTDIPLO),
