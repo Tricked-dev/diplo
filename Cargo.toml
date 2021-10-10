@@ -6,6 +6,8 @@ description = "A script runner for deno made in rust™️"
 authors = ["Tricked-dev"]
 license = "Apache License 2.0"
 readme = "README.md"
+repository = "https://github.com/Tricked-dev/diplo"
+homepage = "https://tricked.pro/diplo"
 
 
 [dependencies]
