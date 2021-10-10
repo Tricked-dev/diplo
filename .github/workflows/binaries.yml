@@ -140,6 +140,10 @@ jobs:
           args: --target=${{ matrix.triple.target }} --manifest-path=Cargo.toml --all-features --release
           use-cross: ${{ matrix.triple.cross }}
 
+      - name: Install Curl
+        if: matrix.triple.os == 'ubuntu-latest'
+        run: sudo apt install libcurl4-openssl-dev libssl-dev
+
       - name: 'Compress executable via UPX (Windows MSVC)'
         if: matrix.triple.os == 'windows-latest'
         uses: crazy-max/ghaction-upx@v1.4.0
