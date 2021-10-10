@@ -7,7 +7,7 @@ use std::{
 
 lazy_static! {
     pub static ref DIPLOJSON: String =
-        env::var("DIPLOJSON").unwrap_or_else(|_| ".diplo".to_owned());
+        env::var("DIPLOJSON").unwrap_or_else(|_| "diplo.json".to_owned());
     pub static ref DOTDIPLO: String = env::var("DOTDIPLO").unwrap_or_else(|_| ".diplo".to_owned());
 }
 
