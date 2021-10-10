@@ -121,7 +121,7 @@ jobs:
 
       - name: Install Curl
         if: matrix.triple.os == 'ubuntu-latest'
-        run: sudo apt install libcurl4-openssl-dev libssl-dev
+        run: sudo apt install libcurl4-openssl-dev libssl-dev build-essential checkinstall zlib1g-dev pkg-config
 
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
