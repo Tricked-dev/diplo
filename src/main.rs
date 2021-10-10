@@ -2,55 +2,20 @@ use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg
 use diplo::{
     create_deps, update_config,
     update_deno::{update_deps, Versions, HTTP_CLIENT},
-    DIPLOJSON, DOTDIPLO,
+    watcher::{get_config, DiploHandler},
+    CONFIG, DIPLOJSON, DOTDIPLO,
 };
-use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
-    collections::HashMap,
     env,
-    fs::{self, read_to_string, write},
-    path::Path,
-    process::{Child, Command},
-    sync::{Arc, Mutex},
+    fs::{self, write},
+    process::Command,
 };
+use watchexec::{run::ExecHandler, watch};
 // use watchexec::config::ConfigBuilder;
-use watchexec::{
-    //ignore
-    config::{Config as WatchConfig, ConfigBuilder as WatchConfigBuilder},
-    error::Result as WatchResult,
-    pathop::PathOp,
-    run::{watch, ExecHandler, Handler, OnBusyUpdate},
-};
-
-#[derive(Serialize, Deserialize)]
-pub struct Config {
-    name: Option<String>,
-    scripts: Option<HashMap<String, String>>,
-    load_env: Option<bool>,
-    import_map: Option<bool>,
-    dependencies: Option<HashMap<String, String>>,
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let data = read_to_string(&*DIPLOJSON);
-
-    let mut config: Config = Config {
-        load_env: Some(false),
-        import_map: Some(false),
-        name: None,
-        scripts: Some(HashMap::new()),
-        dependencies: Some(HashMap::new()),
-    };
-    let has_config: bool;
-    if let Ok(data) = data {
-        config = serde_json::from_str(&data).unwrap();
-        has_config = true
-    } else {
-        has_config = false
-    }
-
     let matches = App::new(crate_name!())
         .version(crate_version!())
         .author(crate_authors!())
@@ -104,9 +69,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if let Some(script) = sub_m.value_of("script") {
                 let mut extra_args: Vec<String> = vec![];
 
-                if let Some(dependencies) = config.dependencies {
+                if let Some(dependencies) = &CONFIG.dependencies {
                     create_deps(&dependencies);
-                    if let Some(import_map) = config.import_map {
+                    if let Some(import_map) = CONFIG.import_map {
                         if import_map {
                             let imports = json!({ "imports": dependencies });
                             write(
@@ -118,13 +83,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
                 }
-                if let Some(load_env) = config.load_env {
+                if let Some(load_env) = CONFIG.load_env {
                     if load_env {
                         dotenv::dotenv().expect("COULD NOT FIND .env FILE IN CURRENT DIRECTORY");
                     }
                 }
 
-                if let Some(data) = config.scripts.unwrap().get(script) {
+                if let Some(data) = CONFIG.scripts.as_ref().unwrap().get(script) {
                     let mut tp = String::from("deno run ");
 
                     //Allow inserting the import-map and future things
@@ -139,53 +104,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let args = parts;
 
                     if sub_m.is_present("watch") {
-                        let config = WatchConfigBuilder::default()
-                            .clear_screen(false)
-                            .run_initially(true)
-                            .paths(vec![".".into()])
-                            .cmd(vec![data_2.into()])
-                            .on_busy_update(OnBusyUpdate::Restart)
-                            .build()?;
-
-                        let handler = MyHandler(ExecHandler::new(config)?);
+                        let config = get_config(&data_2);
+                        let handler = DiploHandler(ExecHandler::new(config)?);
                         watch(&handler).unwrap();
-                        // let command = Arc::new(Mutex::new(data_2));
-                        // // let args = Arc::new(Mutex::new(args));
-                        // let command_clone = command.clone();
-                        // let mut last: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
-                        // let mut last_clone = last.clone();
-                        // let mut watcher = notify::recommended_watcher(
-                        //     move |res: NotifyResult<notify::Event>| {
-                        //         println!("event");
-                        //         match res {
-                        //             Ok(event) => {
-                        //                 if event.kind.is_modify() {
-                        //                     if let Some(&mut last) = &*last_clone.lock().unwrap() {
-                        //                         last.kill();
-                        //                     }
-                        //                     println!("event");
-                        //                     let part = &*command_clone.lock().unwrap();
-
-                        //                     let mut parts = part.trim().split_whitespace();
-                        //                     let command = parts.next().unwrap();
-                        //                     let args = parts;
-
-                        //                     let mut out =
-                        //                         Command::new(command).args(args).spawn().unwrap();
-                        //                     last = Arc::new(Mutex::new(Some(out)));
-                        //                     if let Err(error) = out.wait() {
-                        //                         println!("{}", error);
-                        //                     }
-                        //                 }
-                        //             }
-                        //             Err(e) => println!("watch error: {:?}", e),
-                        //         }
-                        //     },
-                        // )?;
-
-                        // watcher.watch(Path::new("."), RecursiveMode::Recursive)?;
-                        // println!("ended");
-                        // loop {}
                     } else {
                         let mut out = Command::new(command).args(args).spawn().unwrap();
 
@@ -213,9 +134,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("Succesfully wrote changes to {}", &*DIPLOJSON);
                 fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
             } else {
-                if has_config {
-                    println!("WARNING THIS WILL OVERWRITE YOUR OLD {} FILE", &*DIPLOJSON)
-                }
                 let name =
                     rprompt::prompt_reply_stderr("name : ").unwrap_or_else(|_| "".to_owned());
                 let env = rprompt::prompt_reply_stderr("load_env (false): ")
@@ -261,7 +179,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 let json: Result<Versions, serde_json::Error> = serde_json::from_str(&text);
                 if let Ok(json) = json {
-                    let mut deps = config.dependencies.unwrap();
+                    let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
                     deps.insert(
                         (&module).to_string(),
                         format!("https://deno.land/x/{}@{}/mod.ts", module, json.latest),
@@ -277,9 +195,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Some(("install", _)) => {
-            if let Some(dependencies) = config.dependencies {
+            if let Some(dependencies) = &CONFIG.dependencies {
                 create_deps(&dependencies);
-                if let Some(import_map) = config.import_map {
+                if let Some(import_map) = CONFIG.import_map {
                     if import_map {
                         let imports = json!({ "imports": dependencies });
                         write(
@@ -293,7 +211,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Successfully initialized diplo")
         }
         Some(("update", _)) => {
-            let newdeps = update_deps(&config.dependencies.unwrap()).await;
+            let newdeps = update_deps(&CONFIG.dependencies.as_ref().unwrap()).await;
             if let true = update_config(json!({ "dependencies": &newdeps })) {
                 println!("updating done!");
             }
@@ -312,23 +230,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => println!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"), // commit was used                       // Either no subcommand or one not tested for...
     }
     Ok(())
-}
-
-struct MyHandler(ExecHandler);
-
-impl Handler for MyHandler {
-    fn args(&self) -> WatchConfig {
-        self.0.args()
-    }
-
-    fn on_manual(&self) -> WatchResult<bool> {
-        // println!("Running manually!");
-        self.0.on_manual()
-    }
-
-    fn on_update(&self, ops: &[PathOp]) -> WatchResult<bool> {
-        // println!("Running manually {:?}", ops);
-        println!("Noticed file change, restarting");
-        self.0.on_update(ops)
-    }
 }
