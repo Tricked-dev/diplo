@@ -2,7 +2,7 @@
 
 [![Rust](https://github.com/Tricked-dev/diplo/actions/workflows/binaries.yml/badge.svg)](https://github.com/Tricked-dev/diplo/actions/workflows/binaries.yml)
 
-Diplo is a deno script runner made in rust.
+Diplo is a [Deno](https://deno.land/) script runner made in rust.
 
 - [Installing](#installing)
 - [Features](#features)
@@ -15,6 +15,8 @@ Diplo is a deno script runner made in rust.
 # Installing
 
 You can download diplo from the [releases tab](https://github.com/Tricked-dev/diplo/releases) or install it using cargo install diplo
+
+After that you can run `diplo init` for a interactive setup.
 
 # Features
 
