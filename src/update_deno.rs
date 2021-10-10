@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
 pub struct Versions {
-    latest: String,
+    pub latest: String,
 }
 
 lazy_static! {
@@ -47,7 +47,7 @@ pub async fn update_deps(deps: &HashMap<String, String>) -> HashMap<String, Stri
             let text = res.text().await.unwrap();
 
             let json: Versions = serde_json::from_str(&text).unwrap();
-            if !(version == json.latest) {
+            if version != json.latest {
                 println!("updated {} to {} from {}", name, json.latest, version);
                 data.insert(
                     (&key).to_string(),

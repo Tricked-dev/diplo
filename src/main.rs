@@ -1,5 +1,9 @@
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg};
-use diplo::{create_deps, update_config, update_deno::update_deps, DIPLOJSON, DOTDIPLO};
+use diplo::{
+    create_deps, update_config,
+    update_deno::{update_deps, Versions, HTTP_CLIENT},
+    DIPLOJSON, DOTDIPLO,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -72,7 +76,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "This creates the .diplo directory with all required files",
         )).subcommand(App::new("update").about(
             "This updates all deno.land/x/ modules to their latest version",
-        ))
+        )).subcommand(App::new("add").about(
+            "Add a deno.land/x/ module",
+        ).arg(
+                    Arg::new("module")
+                        .about("Deno module you want to add")
+                        .required(true),
+                ))
         .get_matches();
 
     match matches.subcommand() {
@@ -140,9 +150,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if has_config {
                     println!("WARNING THIS WILL OVERWRITE YOUR OLD {} FILE", &*DIPLOJSON)
                 }
-                let name = rprompt::prompt_reply_stderr("name : ").unwrap_or("".to_owned());
-                let env =
-                    rprompt::prompt_reply_stderr("load_env (false): ").unwrap_or("".to_owned());
+                let name =
+                    rprompt::prompt_reply_stderr("name : ").unwrap_or_else(|_| "".to_owned());
+                let env = rprompt::prompt_reply_stderr("load_env (false): ")
+                    .unwrap_or_else(|_| "".to_owned());
                 let load_env: bool;
                 //TODO: FIX THIS MESSY CODE
                 if env.contains("true") {
@@ -150,8 +161,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 } else {
                     load_env = false
                 };
-                let import =
-                    rprompt::prompt_reply_stderr("import_map (false): ").unwrap_or("".to_owned());
+                let import = rprompt::prompt_reply_stderr("import_map (false): ")
+                    .unwrap_or_else(|_| "".to_owned());
                 let import_map: bool;
                 //TODO: FIX THIS MESSY CODE
                 if import.contains("true") {
@@ -167,6 +178,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
                 println!("Succesfully wrote changes to {}", &*DIPLOJSON);
                 fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+            }
+        }
+        Some(("add", sub_m)) => {
+            if let Some(module) = sub_m.value_of("module") {
+                let res = HTTP_CLIENT
+                    .get(format!(
+                        "https://cdn.deno.land/{}/meta/versions.json",
+                        &module
+                    ))
+                    .header("user-agent", "diplo")
+                    .send()
+                    .await
+                    .unwrap();
+                let text = res.text().await.unwrap();
+
+                let json: Result<Versions, serde_json::Error> = serde_json::from_str(&text);
+                if let Ok(json) = json {
+                    let mut deps = config.dependencies.unwrap();
+                    deps.insert(
+                        (&module).to_string(),
+                        format!("https://deno.land/x/{}@{}/mod.ts", module, json.latest),
+                    );
+                    update_config(json!({ "dependencies": deps }));
+                    println!(
+                        "Succesfully added {}@{} to the depdencies",
+                        module, json.latest
+                    )
+                } else {
+                    println!("No module named {} found", module)
+                }
             }
         }
         Some(("install", _)) => {

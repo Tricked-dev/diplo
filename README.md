@@ -6,6 +6,7 @@ Diplo is a [Deno](https://deno.land/) script runner made in rust.
 
 - [Installing](#installing)
 - [Features](#features)
+	- [Easy dependencies](#easy-dependencies)
 	- [Script running](#script-running)
 	- [Dependencies](#dependencies)
 		- [Updating Dependencies](#updating-dependencies)
@@ -16,9 +17,16 @@ Diplo is a [Deno](https://deno.land/) script runner made in rust.
 
 You can download diplo from the [releases tab](https://github.com/Tricked-dev/diplo/releases) or install it using cargo install diplo
 
-After that you can run `diplo init` for a interactive setup.
+After that you can run `diplo init` for a interactive setup.  
+or use `diplo init -y` for a one command setup
 
 # Features
+
+## Easy dependencies
+
+Adding a new dependency is as simple as running `diplo add natico` or whatever else you need
+
+![Add](images/add.png)
 
 ## Script running
 
