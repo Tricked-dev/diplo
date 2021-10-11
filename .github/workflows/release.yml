@@ -12,7 +12,6 @@ env:
   BIN_NAME: diplo
   PROJECT_NAME: diplo
   REPO_NAME: Tricked-dev/diplo
-  # BREW_TAP: jondot/homebrew-tap
 
 jobs:
   dist:
