@@ -1,6 +1,6 @@
 # Diplo <!-- omit in toc -->
 
-[![Rust](https://github.com/Tricked-dev/diplo/actions/workflows/binaries.yml/badge.svg)](https://github.com/Tricked-dev/diplo/actions/workflows/binaries.yml)
+[![Build](https://github.com/Tricked-dev/diplo/actions/workflows/build.yml/badge.svg)](https://github.com/Tricked-dev/diplo/actions/workflows/build.yml)[![Release](https://github.com/Tricked-dev/diplo/actions/workflows/release.yml/badge.svg)](https://github.com/Tricked-dev/diplo/actions/workflows/release.yml)
 
 Diplo is a [Deno](https://deno.land/) script runner made in rust.
 
