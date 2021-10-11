@@ -70,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let mut extra_args: Vec<String> = vec![];
 
                 if let Some(dependencies) = &CONFIG.dependencies {
-                    create_deps(&dependencies);
+                    create_deps(dependencies);
                     if let Some(import_map) = CONFIG.import_map {
                         if import_map {
                             let imports = json!({ "imports": dependencies });
@@ -200,7 +200,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Some(("install", _)) => {
             if let Some(dependencies) = &CONFIG.dependencies {
-                create_deps(&dependencies);
+                create_deps(dependencies);
                 if let Some(import_map) = CONFIG.import_map {
                     if import_map {
                         let imports = json!({ "imports": dependencies });
@@ -215,7 +215,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Successfully initialized diplo")
         }
         Some(("update", _)) => {
-            let newdeps = update_deps(&CONFIG.dependencies.as_ref().unwrap()).await;
+            let newdeps = update_deps(CONFIG.dependencies.as_ref().unwrap()).await;
             if let true = update_config(json!({ "dependencies": &newdeps })) {
                 println!("updating done!");
             }

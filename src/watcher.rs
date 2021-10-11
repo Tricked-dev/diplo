@@ -43,7 +43,7 @@ pub fn get_config(command: &str) -> WatchConfig {
         )
         .build()
         .unwrap();
-    return config;
+    config
 }
 
 pub struct DiploHandler(pub ExecHandler);

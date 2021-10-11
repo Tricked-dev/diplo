@@ -43,7 +43,7 @@ pub fn create_config() -> Config {
         config = serde_json::from_str(&data).unwrap();
     }
 
-    return config;
+    config
 }
 
 pub fn create_deps(dependencies: &HashMap<String, String>) {
