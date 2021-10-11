@@ -6,13 +6,13 @@ Diplo is a [Deno](https://deno.land/) script runner made in rust.
 
 - [Installing](#installing)
 - [Features](#features)
-	- [File watching](#file-watching)
-	- [Easy dependencies](#easy-dependencies)
-	- [Script running](#script-running)
-	- [Dependencies](#dependencies)
-		- [Updating Dependencies](#updating-dependencies)
-	- [Dotenv Support](#dotenv-support)
-	- [Example Config](#example-config)
+  - [File watching](#file-watching)
+  - [Easy dependencies](#easy-dependencies)
+  - [Script running](#script-running)
+  - [Dependencies](#dependencies)
+    - [Updating Dependencies](#updating-dependencies)
+  - [Dotenv Support](#dotenv-support)
+  - [Example Config](#example-config)
 
 # Installing
 
@@ -104,6 +104,10 @@ Diplo can automatically add environment variables using the rust dotenv module i
 	"load_env": true,
 	"dependencies": {
 		"natico": "https://deno.land/x/natico/mod.ts"
+	},
+	"watcher": {
+		"directory": ".",
+		"clear": true
 	}
 }
 ```

@@ -127,9 +127,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if sub_m.is_present("yes") {
                 let data = json!({
                     "name": "diplo-project",
-                    "load_env":false,
+                    "load_env": false,
                     "import_map": false,
-                    "dependencies": {}
+                    "dependencies": {},
+                    "scripts": {},
+                    "watcher": {}
                 });
                 println!("Succesfully wrote changes to {}", &*DIPLOJSON);
                 fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
@@ -158,7 +160,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "name": name,
                     "load_env":load_env,
                     "import_map": import_map,
-                    "dependencies": {}
+                    "dependencies": {},
+                    "scripts": {},
+                    "watcher": {}
                 });
                 println!("Succesfully wrote changes to {}", &*DIPLOJSON);
                 fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();

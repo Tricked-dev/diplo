@@ -15,6 +15,16 @@ pub struct Config {
     pub load_env: Option<bool>,
     pub import_map: Option<bool>,
     pub dependencies: Option<HashMap<String, String>>,
+    pub watcher: Option<WatcherClass>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct WatcherClass {
+    pub directory: Option<String>,
+    pub default_ignores: Option<bool>,
+    pub clear: Option<bool>,
+    pub no_ignore: Option<bool>,
+    pub respect_gitignore: Option<bool>,
 }
 
 pub fn create_config() -> Config {
@@ -26,6 +36,7 @@ pub fn create_config() -> Config {
         name: None,
         scripts: Some(HashMap::new()),
         dependencies: Some(HashMap::new()),
+        watcher: None,
     };
 
     if let Ok(data) = data {

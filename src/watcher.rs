@@ -1,3 +1,4 @@
+use crate::{load_config::WatcherClass, CONFIG};
 use std::path::MAIN_SEPARATOR;
 use watchexec::{
     config::{Config as WatchConfig, ConfigBuilder as WatchConfigBuilder},
@@ -19,13 +20,27 @@ pub fn get_config(command: &str) -> WatchConfig {
         format!("**{}.hg{}**", MAIN_SEPARATOR, MAIN_SEPARATOR),
         format!("**{}.svn{}**", MAIN_SEPARATOR, MAIN_SEPARATOR),
     ];
+    let default: WatcherClass = serde_json::from_str("{}").unwrap();
+    let watch_config = &*CONFIG.watcher.as_ref().unwrap_or(&default);
     let config = WatchConfigBuilder::default()
-        .clear_screen(false)
+        .clear_screen(watch_config.clear.unwrap_or(false))
         .run_initially(true)
-        .paths(vec![".".into()])
+        .paths(vec![watch_config
+            .directory
+            .as_ref()
+            .unwrap_or(&".".to_string())
+            .into()])
         .cmd(vec![command.into()])
         .on_busy_update(OnBusyUpdate::Restart)
-        .ignores(default_ignores)
+        .ignores(
+            if watch_config.no_ignore.unwrap_or(false)
+                && watch_config.default_ignores.unwrap_or(true)
+            {
+                default_ignores
+            } else {
+                vec![]
+            },
+        )
         .build()
         .unwrap();
     return config;
