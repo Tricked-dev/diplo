@@ -119,18 +119,18 @@ jobs:
         if: matrix.build == 'x86_64-linux'
         run: cp target/debian/diplo_* dist/
 
-      - name: Run install pkgbuild
-        if: matrix.build == 'x86_64-linux'
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: cargo-pkgbuild
-      - name: Make pkgbuild
-        if: matrix.build == 'x86_64-linux'
-        run: cargo pkgbuild
-      - name: cp pkgbuild
-        if: matrix.build == 'x86_64-linux'
-        run: mv PKGBUILD dist/
+      # - name: Run install pkgbuild
+      #   if: matrix.build == 'x86_64-linux'
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: install
+      #     args: cargo-pkgbuild
+      # - name: Make pkgbuild
+      #   if: matrix.build == 'x86_64-linux'
+      #   run: cargo pkgbuild
+      # - name: cp pkgbuild
+      #   if: matrix.build == 'x86_64-linux'
+      #   run: mv PKGBUILD dist/
 
       - uses: actions/upload-artifact@v2.2.4
         with:
@@ -178,6 +178,8 @@ jobs:
               if [[ $platform =~ "windows" ]]; then
                   exe=".exe"
               fi
+              [ -f diplo_* ] && mv diplo_* ../dist/
+              [ -f PKGBUILD ] && mv PKGBUILD ../dist/
               pkgname=$PROJECT_NAME-$TAG-$platform
               mkdir tmp/$pkgname
               # cp LICENSE README.md tmp/$pkgname
@@ -191,10 +193,10 @@ jobs:
               fi
           done
 
-      - name: cp pkgbuild
-        run: cp PKGBUILD dist/
-      - name: cp diplo.deb
-        run: cp diplo_* dist/ dist/
+      # - name: cp pkgbuild
+      #   run: cp PKGBUILD dist/
+      # - name: cp diplo.deb
+      #   run: cp diplo_* dist/ dist/
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
