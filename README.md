@@ -62,7 +62,7 @@ if you want to run the script just do `diplo run start` to run the start script.
 
 ## Dependencies
 
-If you add dependencies object to the diplo.json file diplo will automatically create a file called deps.ts inside the .diplo folder.
+Diplo will automatically create a deps.ts file in the .diplo folder if you have dependencies specified in the diplo.json file
 
 ```json
 {
