@@ -163,8 +163,6 @@ jobs:
           echo ::set-output name=val::$name
           echo TAG=$name >> $GITHUB_ENV
         id: tagname
-      
- 
 
       - name: Build archive
         shell: bash
@@ -198,9 +196,9 @@ jobs:
           done
 
       - name: cp diplo.deb
-        run: [ -f diplo_* ] && mv diplo_* ./dist/
+        run: '[ -f diplo_* ] && mv diplo_* ./dist/'
       - name: cp PKGBUILD
-        run: [ -f PKGBUILD ] && mv PKGBUILD ../dist/
+        run: '[ -f PKGBUILD ] && mv PKGBUILD ./dist/'
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
