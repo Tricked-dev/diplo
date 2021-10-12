@@ -193,10 +193,10 @@ jobs:
               fi
           done
 
-      # - name: cp pkgbuild
-      #   run: cp PKGBUILD dist/
-      # - name: cp diplo.deb
-      #   run: cp diplo_* dist/ dist/
+      - name: cp diplo.deb
+        run: [ -f diplo_* ] && mv diplo_* ./dist/
+      - name: cp PKGBUILD
+        run: [ -f PKGBUILD ] && mv PKGBUILD ../dist/
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
