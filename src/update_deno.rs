@@ -5,6 +5,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
+pub struct GithubRelease {
+    #[serde(rename = "tag_name")]
+    tag_name: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct Versions {
     pub latest: String,
 }
@@ -58,6 +64,35 @@ pub async fn update_deps(deps: &HashMap<String, String>) -> HashMap<String, Stri
                         json.latest,
                         part2.as_str()
                     ),
+                );
+            }
+        }
+        if val.contains("https://deno.land/std") {
+            let part = val.replace("https://deno.land/std", "");
+            let part2 = re.captures(&part).unwrap().get(0).unwrap();
+            let part3 = re.replace(&part, "");
+            let ver = at.captures(&part3);
+
+            let version: &str;
+            if let Some(ver) = ver {
+                version = ver.get(1).unwrap().as_str()
+            } else {
+                version = "0"
+            }
+            let res = HTTP_CLIENT
+                .get("https://api.github.com/repos/denoland/deno_std/releases/latest")
+                .header("user-agent", "diplo")
+                .send()
+                .await
+                .unwrap();
+            let text = res.text().await.unwrap();
+
+            let json: GithubRelease = serde_json::from_str(&text).unwrap();
+            if version != json.tag_name {
+                info!("updated std to {} from {}", json.tag_name, version);
+                data.insert(
+                    (&key).to_string(),
+                    format!("https://deno.land/std@{}{}", json.tag_name, part2.as_str()),
                 );
             }
         }
