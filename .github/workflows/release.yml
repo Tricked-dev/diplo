@@ -124,7 +124,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: pkgbuild
+          args: cargo-pkgbuild
       - name: Make pkgbuild
         if: matrix.build == 'x86_64-linux'
         run: cargo pkgbuild
