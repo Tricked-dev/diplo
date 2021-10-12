@@ -149,28 +149,6 @@ jobs:
 
       - uses: actions/download-artifact@v2
 
-<<<<<<< HEAD
-=======
-      - name: Run install cargo-deb
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: cargo-deb
-      - name: Create deb file
-        run: cargo deb
-      - name: cp deb file
-        run: cp target/debian/diplo_* dist/
-
-      - name: Run install pkgbuild
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: pkgbuild
-      - name: Make pkgbuild
-        run: cargo pkgbuild
-      - name: cp pkgbuild
-        run: mv PKGBUILD dist/
->>>>>>> 00c12bf0194601edd8b3d439b2cabdf2b18a07b8
         # with:
         #   path: dist
       # - run: ls -al ./dist
