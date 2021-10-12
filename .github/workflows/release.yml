@@ -122,6 +122,24 @@ jobs:
           submodules: false
 
       - uses: actions/download-artifact@v2
+
+      - name: Run install cargo-deb
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-deb
+      - name: cp deb file
+        run: cp target/debian/diplo_* dist/
+
+      - name: Run install pkgbuild
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: pkgbuild
+      - name: Make pkgbuild
+        run: cargo pkgbuild
+      - name: cp pkgbuild
+        run: cp PKGBUILD dist/
         # with:
         #   path: dist
       # - run: ls -al ./dist

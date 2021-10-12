@@ -9,6 +9,27 @@ readme = "README.md"
 repository = "https://github.com/Tricked-dev/diplo"
 homepage = "https://tricked.pro/diplo"
 
+[package.metadata.deb]
+maintainer = "Tricked-dev"
+copyright = "2021, Tricked-dev"
+license-file = ["LICENSE", "4"]
+extended-description = """https://github.com/Tricked-dev/diplo"""
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+    [
+        "target/release/diplo",
+        "usr/bin/",
+        "755",
+    ],
+    [
+        "README.md",
+        "usr/share/doc/diplo/README",
+        "644",
+    ],
+]
+
 
 [dependencies]
 clap = "3.0.0-beta.4"
