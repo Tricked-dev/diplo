@@ -127,7 +127,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Some(("init", sub_m)) => {
-            if let Ok(_) = fs::File::open(&*DIPLOJSON) {
+            if fs::File::open(&*DIPLOJSON).is_ok() {
                 warn!("THIS WILL RESET YOUR CONFIG");
             }
 
