@@ -1,8 +1,8 @@
 [package]
 name = "diplo"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2018"
-description = "A script runner for deno made in rust™️"
+description = "Diplo is a script runner and dependency manager made in rust"
 authors = ["Tricked-dev"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -22,3 +22,6 @@ openssl = { version = "0.10", features = ["vendored"] }
 regex = "1.5.4"
 rprompt = "1.0.5"
 watchexec = "1.17.1"
+termcolor = "1.1.2"
+anyhow = "1.0.44"
+atty = "0.2.14"

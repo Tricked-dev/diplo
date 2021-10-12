@@ -33,6 +33,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.44"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61604a8f862e1d5c3229fdd78f8b02c68dcf73a4c4b05fd636d12240aaa242c1"
+
+[[package]]
 name = "async-compression"
 version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -282,8 +288,10 @@ dependencies = [
 
 [[package]]
 name = "diplo"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
+ "anyhow",
+ "atty",
  "clap",
  "dotenv",
  "lazy_static",
@@ -293,6 +301,7 @@ dependencies = [
  "rprompt",
  "serde",
  "serde_json",
+ "termcolor",
  "tokio",
  "watchexec",
 ]

@@ -1,3 +1,4 @@
+use crate::{info, term::print_inner};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -31,7 +32,7 @@ pub async fn update_deps(deps: &HashMap<String, String>) -> HashMap<String, Stri
             let part3 = re.replace(&part, "");
             let ver = at.captures(&part3);
             let name = at.replace(&part3, "");
-            println!("{:#?}", ver);
+
             let version: &str;
             if let Some(ver) = ver {
                 version = ver.get(1).unwrap().as_str()
@@ -48,7 +49,7 @@ pub async fn update_deps(deps: &HashMap<String, String>) -> HashMap<String, Stri
 
             let json: Versions = serde_json::from_str(&text).unwrap();
             if version != json.latest {
-                println!("updated {} to {} from {}", name, json.latest, version);
+                info!("updated {} to {} from {}", name, json.latest, version);
                 data.insert(
                     (&key).to_string(),
                     format!(

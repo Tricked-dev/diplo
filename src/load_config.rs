@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{DIPLOJSON, DOTDIPLO};
+use crate::{error, term::print_inner, DIPLOJSON, DOTDIPLO};
 use serde_json::json;
 use serde_json::Value;
 use std::{
@@ -76,7 +76,10 @@ pub fn update_config(val: Value) -> bool {
         write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
         true
     } else {
-        println!("No {} file found please create one", &*DIPLOJSON);
+        error!(
+            "No {} file found please create one or run diplo init",
+            &*DIPLOJSON
+        );
         false
     }
 }

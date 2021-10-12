@@ -1,7 +1,10 @@
 use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg};
 use diplo::{
+    error, info,
     load_config::{create_deps, update_config},
+    term::print_inner,
     update_deno::{update_deps, Versions, HTTP_CLIENT},
+    warn,
     watcher::{get_config, DiploHandler},
     CONFIG, DIPLOJSON, DOTDIPLO,
 };
@@ -117,13 +120,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     return Ok(());
                 }
-                println!(
+                warn!(
                     "Script not found please specify a script from the {} file",
                     &*DIPLOJSON
                 )
             }
         }
         Some(("init", sub_m)) => {
+            if let Ok(_) = fs::File::open(&*DIPLOJSON) {
+                warn!("THIS WILL RESET YOUR CONFIG");
+            }
+
             if sub_m.is_present("yes") {
                 let data = json!({
                     "name": "diplo-project",
@@ -133,7 +140,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "scripts": {},
                     "watcher": {}
                 });
-                println!("Succesfully wrote changes to {}", &*DIPLOJSON);
+                info!("Succesfully wrote changes to {}", &*DIPLOJSON);
                 fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
             } else {
                 let name =
@@ -164,7 +171,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "scripts": {},
                     "watcher": {}
                 });
-                println!("Succesfully wrote changes to {}", &*DIPLOJSON);
+                info!("Succesfully wrote changes to {}", &*DIPLOJSON);
                 fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
             }
         }
@@ -188,13 +195,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         (&module).to_string(),
                         format!("https://deno.land/x/{}@{}/mod.ts", module, json.latest),
                     );
-                    update_config(json!({ "dependencies": deps }));
-                    println!(
-                        "Succesfully added {}@{} to the depdencies",
-                        module, json.latest
-                    )
+                    //Errors otherwise
+                    if let true = update_config(json!({ "dependencies": deps })) {
+                        info!(
+                            "Succesfully added {}@{} to the depdencies",
+                            module, json.latest
+                        )
+                    }
                 } else {
-                    println!("No module named {} found", module)
+                    info!("No module named {} found", module)
                 }
             }
         }
@@ -212,26 +221,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
-            println!("Successfully initialized diplo")
+            info!("Successfully initialized diplo")
         }
         Some(("update", _)) => {
             let newdeps = update_deps(CONFIG.dependencies.as_ref().unwrap()).await;
             if let true = update_config(json!({ "dependencies": &newdeps })) {
-                println!("updating done!");
+                info!("updating done!");
             }
-
-            // let data = read_to_string(&*DIPLOJSON);
-            // if let Ok(data) = data {
-            //     let mut config: Value = serde_json::from_str(&data).unwrap();
-            //     merge(&mut config, json!({ "dependencies": &newdeps }));
-
-            //     fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&config).unwrap()).unwrap();
-            //     println!("updating done!")
-            // } else {
-            //     println!("No diplo.json file found");
-            // }
         }
-        _ => println!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"), // commit was used                       // Either no subcommand or one not tested for...
+        _ => error!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"),
     }
     Ok(())
 }

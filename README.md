@@ -19,6 +19,7 @@
     - [Updating Dependencies](#updating-dependencies)
   - [Dotenv Support](#dotenv-support)
   - [Example Config](#example-config)
+  - [Help menu](#help-menu)
 
 # Installing
 
@@ -78,9 +79,9 @@ updating dependencies is a as simple as running `diplo update` note this will on
 
 ### Import Map Support <!-- omit in toc -->
 
-> This only works on javascript and will cause type errors in typescript
+> This will cause type errors in typescript but works perfectly fine with javascript.
 
-```js
+```ts
 import * as server from 'server';
 ```
 
@@ -122,6 +123,32 @@ Diplo can automatically add environment variables using the rust dotenv module i
 }
 ```
 
+## Help menu
+
+```
+$ diplo --help
+diplo 0.3.0
+
+Tricked-dev
+
+Diplo is a script runner and dependency manager made in rust
+
+USAGE:
+    diplo [SUBCOMMAND]
+
+FLAGS:
+    -h, --help       Print help information
+    -V, --version    Print version information
+
+SUBCOMMANDS:
+    add        Add a deno.land/x/ module
+    help       Print this message or the help of the given subcommand(s)
+    init       Initialize diplo
+    install    This creates the .diplo directory with all required files
+    run        Run a diplo script
+    update     This updates all deno.land/x/ modules to their latest version
+```
+
 ## Donating <!-- omit in toc -->
 
 You can support the project by donating to my xmr address `89prBkdG58KU15jv5LTbP3MgdJ2ikrcyu1vmdTKTGEVdhKRvbxgRN671jfFn3Uivk4Er1JXsc1xFZFbmFCGzVZNLPQeEwZc`
@@ -129,3 +156,7 @@ You can support the project by donating to my xmr address `89prBkdG58KU15jv5LTbP
 ## License <!-- omit in toc -->
 
 This project is licensed under the terms of the [Apache License 2.0](./LICENSE)
+
+```
+
+```
