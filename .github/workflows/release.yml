@@ -106,6 +106,32 @@ jobs:
             cp "target/${{ matrix.target }}/release/$BIN_NAME" "dist/"
           fi
 
+      - name: Run install cargo-deb
+        if: matrix.build == 'x86_64-linux'
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-deb
+      - name: Create deb file
+        if: matrix.build == 'x86_64-linux'
+        run: cargo deb
+      - name: cp deb file
+        if: matrix.build == 'x86_64-linux'
+        run: cp target/debian/diplo_* dist/
+
+      # - name: Run install pkgbuild
+      #   if: matrix.build == 'x86_64-linux'
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: install
+      #     args: cargo-pkgbuild
+      # - name: Make pkgbuild
+      #   if: matrix.build == 'x86_64-linux'
+      #   run: cargo pkgbuild
+      # - name: cp pkgbuild
+      #   if: matrix.build == 'x86_64-linux'
+      #   run: mv PKGBUILD dist/
+
       - uses: actions/upload-artifact@v2.2.4
         with:
           name: bins-${{ matrix.build }}
@@ -122,6 +148,7 @@ jobs:
           submodules: false
 
       - uses: actions/download-artifact@v2
+
         # with:
         #   path: dist
       # - run: ls -al ./dist
@@ -145,12 +172,16 @@ jobs:
           rm -rf tmp
           mkdir tmp
           mkdir dist
+          [ -f diplo_* ] && mv diplo_* ./dist/
+          [ -f PKGBUILD ] && mv PKGBUILD ./dist/
 
           for dir in bins-* ; do
               platform=${dir#"bins-"}
               if [[ $platform =~ "windows" ]]; then
                   exe=".exe"
               fi
+              [ -f diplo_* ] && mv diplo_* ../dist/
+              [ -f PKGBUILD ] && mv PKGBUILD ../dist/
               pkgname=$PROJECT_NAME-$TAG-$platform
               mkdir tmp/$pkgname
               # cp LICENSE README.md tmp/$pkgname
