@@ -1,4 +1,5 @@
 use crate::{info, term::print_inner};
+use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -21,79 +22,103 @@ lazy_static! {
         .brotli(true)
         .build()
         .unwrap();
+    pub static ref PATH: Regex = Regex::new("/(.*).ts").unwrap();
+    pub static ref VERSION: Regex = Regex::new("@(.*)").unwrap();
+}
+
+pub async fn get_latest_x_module(name: &str) -> String {
+    let res = HTTP_CLIENT
+        .get(format!("https://cdn.deno.land/{}/meta/versions.json", name))
+        .header("user-agent", "diplo")
+        .send()
+        .await
+        .unwrap();
+    let text = res.text().await.unwrap();
+
+    let json: Versions = serde_json::from_str(&text).unwrap();
+    json.latest
+}
+
+pub async fn get_latest_std() -> String {
+    let res = HTTP_CLIENT
+        .get("https://api.github.com/repos/denoland/deno_std/releases/latest")
+        .header("user-agent", "diplo")
+        .send()
+        .await
+        .unwrap();
+    let text = res.text().await.unwrap();
+
+    let json: GithubRelease = serde_json::from_str(&text).unwrap();
+    json.tag_name
+}
+
+pub async fn update_deno_std(val: String) -> Result<String> {
+    let part = val.replace("https://deno.land/std", "");
+    let part2 = PATH.captures(&part).unwrap().get(0).unwrap();
+    let part3 = PATH.replace(&part, "");
+    let ver = VERSION.captures(&part3);
+
+    let version: &str;
+    if let Some(ver) = ver {
+        version = ver.get(1).unwrap().as_str()
+    } else {
+        version = "0"
+    }
+    let latest_std = get_latest_std().await;
+    if version != latest_std {
+        info!("updated std to {} from {}", latest_std, version);
+        Ok(format!(
+            "https://deno.land/std@{}{}",
+            latest_std,
+            part2.as_str()
+        ))
+    } else {
+        Err(anyhow!(""))
+    }
+}
+pub async fn update_deno_x(val: String) -> Result<String> {
+    let part = val.replace("https://deno.land/x/", "");
+    let part2 = PATH.captures(&part).unwrap().get(0).unwrap();
+    let part3 = PATH.replace(&part, "");
+    let ver = VERSION.captures(&part3);
+    let name = VERSION.replace(&part3, "");
+
+    let version: &str;
+    if let Some(ver) = ver {
+        version = ver.get(1).unwrap().as_str()
+    } else {
+        version = "0"
+    }
+
+    let new_version = get_latest_x_module(&name).await;
+    if version != new_version {
+        info!("updated {} to {} from {}", name, new_version, version);
+        Ok(format!(
+            "https://deno.land/x/{}@{}{}",
+            name,
+            new_version,
+            part2.as_str()
+        ))
+    } else {
+        Err(anyhow!(""))
+    }
 }
 
 pub async fn update_deps(deps: &HashMap<String, String>) -> HashMap<String, String> {
     let mut data: HashMap<String, String> = HashMap::new();
-    let re = Regex::new("/(.*).ts").unwrap();
-    let at = Regex::new("@(.*)").unwrap();
     for (key, val) in deps.iter() {
         data.insert((&key).to_string(), (&val).to_string());
         //https://cdn.deno.land/natico/meta/versions.json
         //https://cdn.deno.land/natico/versions/3.0.0-rc.1/meta/meta.json
         //https://deno.land/x/natico@3.0.0-rc.1/doc_mod.ts
         if val.contains("https://deno.land/x/") {
-            let part = val.replace("https://deno.land/x/", "");
-            let part2 = re.captures(&part).unwrap().get(0).unwrap();
-            let part3 = re.replace(&part, "");
-            let ver = at.captures(&part3);
-            let name = at.replace(&part3, "");
-
-            let version: &str;
-            if let Some(ver) = ver {
-                version = ver.get(1).unwrap().as_str()
-            } else {
-                version = "0"
-            }
-            let res = HTTP_CLIENT
-                .get(format!("https://cdn.deno.land/{}/meta/versions.json", name))
-                .header("user-agent", "diplo")
-                .send()
-                .await
-                .unwrap();
-            let text = res.text().await.unwrap();
-
-            let json: Versions = serde_json::from_str(&text).unwrap();
-            if version != json.latest {
-                info!("updated {} to {} from {}", name, json.latest, version);
-                data.insert(
-                    (&key).to_string(),
-                    format!(
-                        "https://deno.land/x/{}@{}{}",
-                        name,
-                        json.latest,
-                        part2.as_str()
-                    ),
-                );
+            if let Ok(result) = update_deno_x(val.to_string()).await {
+                data.insert((&key).to_string(), result);
             }
         }
         if val.contains("https://deno.land/std") {
-            let part = val.replace("https://deno.land/std", "");
-            let part2 = re.captures(&part).unwrap().get(0).unwrap();
-            let part3 = re.replace(&part, "");
-            let ver = at.captures(&part3);
-
-            let version: &str;
-            if let Some(ver) = ver {
-                version = ver.get(1).unwrap().as_str()
-            } else {
-                version = "0"
-            }
-            let res = HTTP_CLIENT
-                .get("https://api.github.com/repos/denoland/deno_std/releases/latest")
-                .header("user-agent", "diplo")
-                .send()
-                .await
-                .unwrap();
-            let text = res.text().await.unwrap();
-
-            let json: GithubRelease = serde_json::from_str(&text).unwrap();
-            if version != json.tag_name {
-                info!("updated std to {} from {}", json.tag_name, version);
-                data.insert(
-                    (&key).to_string(),
-                    format!("https://deno.land/std@{}{}", json.tag_name, part2.as_str()),
-                );
+            if let Ok(result) = update_deno_std(val.to_string()).await {
+                data.insert((&key).to_string(), result);
             }
         }
     }

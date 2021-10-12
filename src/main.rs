@@ -3,7 +3,7 @@ use diplo::{
     error, info,
     load_config::{create_deps, update_config},
     term::print_inner,
-    update_deno::{update_deps, Versions, HTTP_CLIENT},
+    update_deno::{get_latest_std, update_deps, Versions, HTTP_CLIENT},
     warn,
     watcher::{get_config, DiploHandler},
     CONFIG, DIPLOJSON, DOTDIPLO,
@@ -59,11 +59,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .about("This updates all deno.land/x/ modules to their latest version"),
         )
         .subcommand(
-            App::new("add").about("Add a deno.land/x/ module").arg(
-                Arg::new("module")
-                    .about("Deno module you want to add")
-                    .required(true),
-            ),
+            App::new("add")
+                .about("Add a deno.land/x/ module")
+                .arg(
+                    Arg::new("module")
+                        .about("Deno module you want to add")
+                        .required(true),
+                )
+                .arg(
+                    Arg::new("std")
+                        .about("Add a std package")
+                        .required(false)
+                        .takes_value(false)
+                        .short('s')
+                        .long("std"),
+                ),
         )
         .get_matches();
 
@@ -140,7 +150,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "scripts": {},
                     "watcher": {}
                 });
-                info!("Succesfully wrote changes to {}", &*DIPLOJSON);
+                info!("Successfully wrote changes to {}", &*DIPLOJSON);
                 fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
             } else {
                 let name =
@@ -177,33 +187,45 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Some(("add", sub_m)) => {
             if let Some(module) = sub_m.value_of("module") {
-                let res = HTTP_CLIENT
-                    .get(format!(
-                        "https://cdn.deno.land/{}/meta/versions.json",
-                        &module
-                    ))
-                    .header("user-agent", "diplo")
-                    .send()
-                    .await
-                    .unwrap();
-                let text = res.text().await.unwrap();
+                if sub_m.is_present("std") {
+                    let latest_std = get_latest_std().await;
 
-                let json: Result<Versions, serde_json::Error> = serde_json::from_str(&text);
-                if let Ok(json) = json {
+                    let data = &format!("https://deno.land/std@{}/{}/mod.ts", latest_std, module);
                     let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
-                    deps.insert(
-                        (&module).to_string(),
-                        format!("https://deno.land/x/{}@{}/mod.ts", module, json.latest),
-                    );
+                    deps.insert((&module).to_string(), data.to_string());
                     //Errors otherwise
                     if let true = update_config(json!({ "dependencies": deps })) {
-                        info!(
-                            "Succesfully added {}@{} to the depdencies",
-                            module, json.latest
-                        )
+                        info!("Succesfully added {} to the dependencies", data)
                     }
                 } else {
-                    info!("No module named {} found", module)
+                    let res = HTTP_CLIENT
+                        .get(format!(
+                            "https://cdn.deno.land/{}/meta/versions.json",
+                            &module
+                        ))
+                        .header("user-agent", "diplo")
+                        .send()
+                        .await
+                        .unwrap();
+                    let text = res.text().await.unwrap();
+
+                    let json: Result<Versions, serde_json::Error> = serde_json::from_str(&text);
+                    if let Ok(json) = json {
+                        let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
+                        deps.insert(
+                            (&module).to_string(),
+                            format!("https://deno.land/x/{}@{}/mod.ts", module, json.latest),
+                        );
+                        //Errors otherwise
+                        if let true = update_config(json!({ "dependencies": deps })) {
+                            info!(
+                                "Succesfully added {}@{} to the dependencies",
+                                module, json.latest
+                            )
+                        }
+                    } else {
+                        info!("No module named {} found", module)
+                    }
                 }
             }
         }

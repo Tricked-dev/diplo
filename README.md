@@ -43,6 +43,18 @@ $ diplo run <script> --watch
 
 Adding a new dependency is as simple as running `diplo add natico` or whatever else you need
 
+```
+$ diplo add natico
+info: Successfully added natico@3.0.0-rc.1 to the dependencies
+```
+
+adding std modules
+
+```
+$ diplo add -s fs
+info: Successfully added https://deno.land/std@0.110.0/fs/mod.ts to the dependencies
+```
+
 ![Add](assets/add.png)
 
 ## Script running
@@ -76,6 +88,14 @@ Diplo will automatically create a deps.ts file in the .diplo folder if you have 
 ### Updating Dependencies
 
 updating dependencies is a as simple as running `diplo update` note this will only update `deno.land/x/` packages
+
+```
+$ diplo update
+info: updated discordeno to 12.0.1 from 13.0.1
+info: updated harmony to v2.2.0 from v1.2.0
+info: updated std to 0.110.0 from 0.10.0
+info: updating done!
+```
 
 ### Import Map Support <!-- omit in toc -->
 
