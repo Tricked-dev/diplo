@@ -1,8 +1,14 @@
-# Diplo <!-- omit in toc -->
+<p align="center" width="200" height="400">
+	<br>
+    <img src="assets/diplo_small.svg" width="auto" height="100">
+	<br>
+ <p align="center">
+ 
+<!-- # Diplo omit in toc -->
 
-[![Build](https://github.com/Tricked-dev/diplo/actions/workflows/build.yml/badge.svg)](https://github.com/Tricked-dev/diplo/actions/workflows/build.yml)[![Release](https://github.com/Tricked-dev/diplo/actions/workflows/release.yml/badge.svg)](https://github.com/Tricked-dev/diplo/actions/workflows/release.yml)
+[![GitHub issues](https://img.shields.io/github/issues/tricked-dev/diplo?style=for-the-badge)](https://github.com/tricked-dev/diplo/issues)[![GitHub license](https://img.shields.io/github/license/Tricked-dev/diplo?style=for-the-badge)](https://github.com/Tricked-dev/diplo/blob/main/LICENSE&style=for-the-badge)![Crates.io](https://img.shields.io/crates/d/diplo?label=crate%20downloads&style=for-the-badge)![GitHub all releases](https://img.shields.io/github/downloads/tricked-dev/diplo/total?label=github%20downloads&style=for-the-badge)![Discord](https://img.shields.io/discord/748956745409232945?logo=discord&style=for-the-badge)
 
-Diplo is a [Deno](https://deno.land/) script runner made in rust.
+### Diplo is a script runner and dependency manager made in rust mainly for [Deno](https://deno.land/).
 
 - [Installing](#installing)
 - [Features](#features)
@@ -28,11 +34,15 @@ or use `diplo init -y` for a one command setup
 Diplo can replace [Denon](https://github.com/denosaurs/denon) in terms of restarting on file change.  
 To restart a script on save you just have to append `--watch` to `diplo run <script>`
 
+```sh
+$ diplo run <script> --watch
+```
+
 ## Easy dependencies
 
 Adding a new dependency is as simple as running `diplo add natico` or whatever else you need
 
-![Add](images/add.png)
+![Add](assets/add.png)
 
 ## Script running
 
