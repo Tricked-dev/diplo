@@ -87,6 +87,32 @@ jobs:
         if: matrix.build == 'x86_64-linux' || matrix.build == 'x86_64-macos'
         run: strip "target/${{ matrix.target }}/release/$BIN_NAME"
 
+      - name: Run install cargo-deb
+        if: matrix.build == 'x86_64-linux'
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-deb
+      - name: Create deb file
+        if: matrix.build == 'x86_64-linux'
+        run: cargo deb
+      - name: cp deb file
+        if: matrix.build == 'x86_64-linux'
+        run: cp target/debian/diplo_* dist/
+
+      - name: Run install pkgbuild
+        if: matrix.build == 'x86_64-linux'
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: pkgbuild
+      - name: Make pkgbuild
+        if: matrix.build == 'x86_64-linux'
+        run: cargo pkgbuild
+      - name: cp pkgbuild
+        if: matrix.build == 'x86_64-linux'
+        run: mv PKGBUILD dist/
+
       - name: Strip release binary (arm)
         if: matrix.build == 'aarch64-linux'
         run: |
@@ -123,23 +149,6 @@ jobs:
 
       - uses: actions/download-artifact@v2
 
-      - name: Run install cargo-deb
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: cargo-deb
-      - name: cp deb file
-        run: cp target/debian/diplo_* dist/
-
-      - name: Run install pkgbuild
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: pkgbuild
-      - name: Make pkgbuild
-        run: cargo pkgbuild
-      - name: cp pkgbuild
-        run: cp PKGBUILD dist/
         # with:
         #   path: dist
       # - run: ls -al ./dist
@@ -181,6 +190,11 @@ jobs:
                   (cd tmp && 7z a -r ../dist/$pkgname.zip $pkgname)
               fi
           done
+
+      - name: cp pkgbuild
+        run: cp PKGBUILD dist/
+      - name: cp diplo.deb
+        run: cp diplo_* dist/ dist/
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
