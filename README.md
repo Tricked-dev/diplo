@@ -6,7 +6,7 @@
  
 <!-- # Diplo omit in toc -->
 
-[![GitHub issues](https://img.shields.io/github/issues/tricked-dev/diplo?style=for-the-badge)](https://github.com/tricked-dev/diplo/issues)[![GitHub license](https://img.shields.io/github/license/Tricked-dev/diplo?style=for-the-badge)](https://github.com/Tricked-dev/diplo/blob/main/LICENSE&style=for-the-badge)![Crates.io](https://img.shields.io/crates/d/diplo?label=crate%20downloads&style=for-the-badge)![GitHub all releases](https://img.shields.io/github/downloads/tricked-dev/diplo/total?label=github%20downloads&style=for-the-badge)![Discord](https://img.shields.io/discord/748956745409232945?logo=discord&style=for-the-badge)
+[![GitHub issues](https://img.shields.io/github/issues/tricked-dev/diplo?style=for-the-badge)](https://github.com/tricked-dev/diplo/issues)[![GitHub license](https://img.shields.io/github/license/Tricked-dev/diplo?style=for-the-badge)](https://github.com/Tricked-dev/diplo/blob/main/LICENSE)[![Crates.io](https://img.shields.io/crates/d/diplo?label=crate%20downloads&style=for-the-badge)](https://crates.io/crates/diplo/)[![GitHub all releases](https://img.shields.io/github/downloads/tricked-dev/diplo/total?label=github%20downloads&style=for-the-badge)](https://github.com/Tricked-dev/diplo/releases/tag/v0.3.1)[![Discord](https://img.shields.io/discord/748956745409232945?logo=discord&style=for-the-badge)](https://discord.gg/mY8zTARu4g)
 
 ### Diplo is a script runner and dependency manager made in rust mainly for [Deno](https://deno.land/).
 
@@ -156,7 +156,3 @@ You can support the project by donating to my xmr address `89prBkdG58KU15jv5LTbP
 ## License <!-- omit in toc -->
 
 This project is licensed under the terms of the [Apache License 2.0](./LICENSE)
-
-```
-
-```
