@@ -221,12 +221,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let env = rprompt::prompt_reply_stderr("load_env (false): ")
                     .unwrap_or_else(|_| "".to_owned());
 
-                let load_env = if env.contains("true") { true } else { false };
+                let load_env = env.contains("true");
 
                 let import = rprompt::prompt_reply_stderr("import_map (false): ")
                     .unwrap_or_else(|_| "".to_owned());
 
-                let import_map = if import.contains("true") { true } else { false };
+                let import_map = import.contains("true");
 
                 let data = json!({
                     "name": name,
