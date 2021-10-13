@@ -172,16 +172,14 @@ jobs:
           rm -rf tmp
           mkdir tmp
           mkdir dist
-          [ -f diplo_* ] && mv diplo_* ./dist/
-          [ -f PKGBUILD ] && mv PKGBUILD ./dist/
+
 
           for dir in bins-* ; do
               platform=${dir#"bins-"}
               if [[ $platform =~ "windows" ]]; then
                   exe=".exe"
               fi
-              [ -f diplo_* ] && mv diplo_* ../dist/
-              [ -f PKGBUILD ] && mv PKGBUILD ../dist/
+
               pkgname=$PROJECT_NAME-$TAG-$platform
               mkdir tmp/$pkgname
               # cp LICENSE README.md tmp/$pkgname

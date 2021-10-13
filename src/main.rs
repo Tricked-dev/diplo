@@ -31,7 +31,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .about("The script to run defined in the diplo.json file")
                         .required(true),
                 )
-                // TODO: add watch its way too hard to add with closures etc but maybe one day
                 .arg(
                     Arg::new("watch")
                         .about("Watch the filesystem for changes and restart on changes")
@@ -50,6 +49,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .short('y')
                     .long("yes"),
             ),
+        )
+        .subcommand(
+            App::new("exec")
+                .about("Dynamically run a command")
+                .arg(Arg::new("command").about("command to run").required(true))
+                .arg(
+                    Arg::new("watch")
+                        .about("Watch the filesystem for changes and restart on changes")
+                        .required(false)
+                        .takes_value(false)
+                        .short('w')
+                        .long("watch"),
+                ),
         )
         .subcommand(
             App::new("install").about("This creates the .diplo directory with all required files"),
@@ -110,17 +122,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     let data_2 = data.replace("deno run", &tp);
 
-                    let mut parts = data_2.trim().split_whitespace();
-
-                    let command = parts.next().unwrap();
-
-                    let args = parts;
-
                     if sub_m.is_present("watch") {
                         let config = get_config(&data_2);
                         let handler = DiploHandler(ExecHandler::new(config)?);
                         watch(&handler).unwrap();
                     } else {
+                        let mut parts = data_2.trim().split_whitespace();
+
+                        let command = parts.next().unwrap();
+
+                        let args = parts;
+
                         let mut out = Command::new(command).args(args).spawn().unwrap();
 
                         if let Err(error) = out.wait() {
@@ -136,6 +148,57 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 )
             }
         }
+        Some(("exec", sub_m)) => {
+            if let Some(script) = sub_m.value_of("command") {
+                let mut extra_args: Vec<String> = vec![];
+
+                if let Some(dependencies) = &CONFIG.dependencies {
+                    create_deps(dependencies);
+                    if let Some(import_map) = CONFIG.import_map {
+                        if import_map {
+                            let imports = json!({ "imports": dependencies });
+                            write(
+                                format!("{}/import_map.json", &*DOTDIPLO),
+                                serde_json::to_string(&imports).unwrap(),
+                            )
+                            .unwrap();
+                            extra_args.push(format!("--import-map={}/import_map.json", &*DOTDIPLO));
+                        }
+                    }
+                }
+                if let Some(load_env) = CONFIG.load_env {
+                    if load_env {
+                        dotenv::dotenv().expect("COULD NOT FIND .env FILE IN CURRENT DIRECTORY");
+                    }
+                }
+
+                let mut tp = String::from("deno run ");
+
+                //Allow inserting the import-map and future things
+                tp.push_str(&extra_args.join(" "));
+
+                let data_2 = script.replace("deno run", &tp);
+
+                if sub_m.is_present("watch") {
+                    let config = get_config(&data_2);
+                    let handler = DiploHandler(ExecHandler::new(config)?);
+                    watch(&handler).unwrap();
+                } else {
+                    let mut parts = data_2.trim().split_whitespace();
+
+                    let command = parts.next().unwrap();
+
+                    let args = parts;
+
+                    let mut out = Command::new(command).args(args).spawn().unwrap();
+
+                    if let Err(error) = out.wait() {
+                        println!("{}", error);
+                    }
+                }
+            }
+        }
+
         Some(("init", sub_m)) => {
             if fs::File::open(&*DIPLOJSON).is_ok() {
                 warn!("THIS WILL RESET YOUR CONFIG");
@@ -157,22 +220,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     rprompt::prompt_reply_stderr("name : ").unwrap_or_else(|_| "".to_owned());
                 let env = rprompt::prompt_reply_stderr("load_env (false): ")
                     .unwrap_or_else(|_| "".to_owned());
-                let load_env: bool;
-                //TODO: FIX THIS MESSY CODE
-                if env.contains("true") {
-                    load_env = true
-                } else {
-                    load_env = false
-                };
+
+                let load_env = if env.contains("true") { true } else { false };
+
                 let import = rprompt::prompt_reply_stderr("import_map (false): ")
                     .unwrap_or_else(|_| "".to_owned());
-                let import_map: bool;
-                //TODO: FIX THIS MESSY CODE
-                if import.contains("true") {
-                    import_map = true
-                } else {
-                    import_map = false
-                };
+
+                let import_map = if import.contains("true") { true } else { false };
+
                 let data = json!({
                     "name": name,
                     "load_env":load_env,
