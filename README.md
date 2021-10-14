@@ -10,16 +10,18 @@
 
 ### Diplo is a script runner and dependency manager made in rust mainly for [Deno](https://deno.land/).
 
+##### Documentation [Tricked.pro/diplo](https://tricked.pro/diplo)
+
 - [Installing](#installing)
 - [Features](#features)
-  - [File watching](#file-watching)
-  - [Easy dependencies](#easy-dependencies)
-  - [Script running](#script-running)
-  - [Dependencies](#dependencies)
-    - [Updating Dependencies](#updating-dependencies)
-  - [Dotenv Support](#dotenv-support)
-  - [Example Config](#example-config)
-  - [Help menu](#help-menu)
+	- [File watching](#file-watching)
+	- [Easy dependencies](#easy-dependencies)
+	- [Script running](#script-running)
+	- [Dependencies](#dependencies)
+		- [Updating Dependencies](#updating-dependencies)
+	- [Dotenv Support](#dotenv-support)
+	- [Example Config](#example-config)
+	- [Help menu](#help-menu)
 
 # Installing
 
