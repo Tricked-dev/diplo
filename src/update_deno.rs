@@ -78,14 +78,7 @@ pub async fn update_deno_std(val: String) -> Result<String> {
 }
 pub async fn update_deno_x(val: String) -> Result<String> {
     let part = val.replace("https://deno.land/x/", "");
-    let part2 = PATH
-        .captures(&part)
-        .expect(&format!(
-            "{} doesn't end with .ts/.js or isn't a valid path",
-            part
-        ))
-        .get(0)
-        .unwrap();
+    let part2 = PATH.captures(&part).unwrap().get(0).unwrap();
     let part3 = PATH.replace(&part, "");
     let ver = VERSION.captures(&part3);
     let name = VERSION.replace(&part3, "");
