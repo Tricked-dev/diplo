@@ -22,7 +22,7 @@ lazy_static! {
         .brotli(true)
         .build()
         .unwrap();
-    pub static ref PATH: Regex = Regex::new("/(.*).ts").unwrap();
+    pub static ref PATH: Regex = Regex::new("/(.*).(ts|js)").unwrap();
     pub static ref VERSION: Regex = Regex::new("@(.*)").unwrap();
 }
 
@@ -78,7 +78,14 @@ pub async fn update_deno_std(val: String) -> Result<String> {
 }
 pub async fn update_deno_x(val: String) -> Result<String> {
     let part = val.replace("https://deno.land/x/", "");
-    let part2 = PATH.captures(&part).unwrap().get(0).unwrap();
+    let part2 = PATH
+        .captures(&part)
+        .expect(&format!(
+            "{} doesn't end with .ts/.js or isn't a valid path",
+            part
+        ))
+        .get(0)
+        .unwrap();
     let part3 = PATH.replace(&part, "");
     let ver = VERSION.captures(&part3);
     let name = VERSION.replace(&part3, "");
@@ -123,4 +130,34 @@ pub async fn update_deps(deps: &HashMap<String, String>) -> HashMap<String, Stri
         }
     }
     data
+}
+
+#[cfg(test)]
+mod tests {
+    use super::update_deps;
+    use std::collections::HashMap;
+
+    #[tokio::test]
+    async fn update_some_deps() {
+        let mut deps: HashMap<String, String> = HashMap::new();
+
+        deps.insert(
+            "natico".to_owned(),
+            "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
+        );
+        deps.insert(
+            "discordeno".to_owned(),
+            "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
+        );
+        deps.insert(
+            "lodash".to_owned(),
+            "https://deno.land/x/lodash@4.17.19/dist/lodash.core.js".to_owned(),
+        );
+        deps.insert(
+            "crypto".to_owned(),
+            "https://deno.land/std@0.111.0/node/crypto.ts".to_owned(),
+        );
+
+        update_deps(&deps).await;
+    }
 }
