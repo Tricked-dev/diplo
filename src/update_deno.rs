@@ -130,6 +130,7 @@ mod tests {
     use super::update_deps;
     use std::collections::HashMap;
 
+    #[cfg(not(target_os = "macos"))]
     #[tokio::test]
     async fn update_some_deps() {
         let mut deps: HashMap<String, String> = HashMap::new();
