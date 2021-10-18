@@ -1,15 +1,15 @@
 use anyhow::Result;
 use clap::ArgMatches;
-use diplo::{info, term::print_inner, warn, DIPLOJSON};
+use diplo::{info, term::print_inner, warn, DIPLO_CONFIG};
 use serde_json::json;
 use std::fs::{self};
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
-    if fs::File::open(&*DIPLOJSON).is_ok() {
+    if fs::File::open(&*DIPLO_CONFIG).is_ok() {
         warn!("THIS WILL RESET YOUR CONFIG");
     }
-
-    if sub_m.is_present("yes") {
+    //json option + yes enabled
+    if sub_m.is_present("yes") && sub_m.is_present("json") {
         let data = json!({
             "name": "diplo-project",
             "load_env": false,
@@ -18,8 +18,12 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
             "scripts": {},
             "watcher": {}
         });
-        info!("Successfully wrote changes to {}", &*DIPLOJSON);
-        fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+        info!("Successfully wrote changes to {}", &*DIPLO_CONFIG);
+        fs::write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+    } else if sub_m.is_present("yes") {
+        let data = "name= \"diplo project\"\nload_env=false\nimport_map=false\n[dependencies]\n[scripts]\n[watcher]";
+        info!("Successfully wrote changes to {}", &*DIPLO_CONFIG);
+        fs::write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
     } else {
         let name = rprompt::prompt_reply_stderr("name : ").unwrap_or_else(|_| "".to_owned());
         let env =
@@ -32,16 +36,21 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
 
         let import_map = import.contains("true");
 
-        let data = json!({
-            "name": name,
-            "load_env":load_env,
-            "import_map": import_map,
-            "dependencies": {},
-            "scripts": {},
-            "watcher": {}
-        });
-        info!("Succesfully wrote changes to {}", &*DIPLOJSON);
-        fs::write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+        let data = if sub_m.is_present("json") {
+            let data = json!({
+                "name": name,
+                "load_env":load_env,
+                "import_map": import_map,
+                "dependencies": {},
+                "scripts": {},
+                "watcher": {}
+            });
+            serde_json::to_string_pretty(&data).unwrap()
+        } else {
+            format!("name= \"{name}\"\nload_env={load_env}\nimport_map={import_map}\n[dependencies]\n[scripts]\n[watcher]",name=name,load_env=load_env, import_map = import_map )
+        };
+        info!("Succesfully wrote changes to {}", &*DIPLO_CONFIG);
+        fs::write(&*DIPLO_CONFIG, data).unwrap();
     }
     Ok(())
 }

@@ -5,7 +5,7 @@ use diplo::{
     term::print_inner,
     warn,
     watcher::{get_config, DiploHandler},
-    CONFIG, DIPLOJSON, DOTDIPLO,
+    CONFIG, DIPLO_CONFIG, DOTDIPLO,
 };
 use serde_json::json;
 use std::{fs::write, process::Command};
@@ -65,7 +65,7 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
         }
         warn!(
             "Script not found please specify a script from the {} file",
-            &*DIPLOJSON
+            &*DIPLO_CONFIG
         )
     }
     Ok(())

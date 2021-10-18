@@ -17,6 +17,7 @@ pub struct Versions {
 }
 
 lazy_static! {
+    //Static http client since creating one on every request isn't performant
     pub static ref HTTP_CLIENT: reqwest::Client = reqwest::Client::builder()
         .gzip(true)
         .brotli(true)

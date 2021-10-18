@@ -1,6 +1,5 @@
 {
 	"deno.enable": true,
 	"deno.lint": true,
-	"deno.unstable": true,
-	"svg.preview.background": "custom"
+	"deno.importMap": "./.diplo/import_map.json"
 }

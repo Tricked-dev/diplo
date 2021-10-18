@@ -1,12 +1,13 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{error, term::print_inner, DIPLOJSON, DOTDIPLO};
+use crate::{error, term::print_inner, DIPLO_CONFIG, DOTDIPLO};
 use serde_json::json;
 use serde_json::Value;
 use std::{
     collections::HashMap,
     fs::{create_dir_all, read_to_string, write},
 };
+use toml_edit::Document;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
@@ -28,20 +29,41 @@ pub struct WatcherClass {
 }
 
 pub fn create_config() -> Config {
-    let data = read_to_string(&*DIPLOJSON);
+    let data = read_to_string(&*DIPLO_CONFIG);
 
-    let mut config: Config = Config {
-        load_env: Some(false),
-        import_map: Some(false),
-        name: None,
-        scripts: Some(HashMap::new()),
-        dependencies: Some(HashMap::new()),
-        watcher: None,
+    let config: Config = match data {
+        Ok(data) =>
+        //if DIPLO_CONFIG.ends_with(".json")
+        {
+            if DIPLO_CONFIG.ends_with(".toml") {
+                toml::from_str(&data).unwrap()
+            } else {
+                serde_json::from_str(&data).unwrap()
+            }
+        }
+        // serde_json::from_str(&data).unwrap()
+        _ => Config {
+            load_env: Some(false),
+            import_map: Some(false),
+            name: None,
+            scripts: Some(HashMap::new()),
+            dependencies: Some(HashMap::new()),
+            watcher: None,
+        },
     };
 
-    if let Ok(data) = data {
-        config = serde_json::from_str(&data).unwrap();
-    }
+    // let mut config: Config = Config {
+    //     load_env: Some(false),
+    //     import_map: Some(false),
+    //     name: None,
+    //     scripts: Some(HashMap::new()),
+    //     dependencies: Some(HashMap::new()),
+    //     watcher: None,
+    // };
+
+    // if let Ok(data) = data {
+    //     config = serde_json::from_str(&data).unwrap();
+    // }
 
     config
 }
@@ -67,18 +89,22 @@ pub fn merge(a: &mut Value, b: Value) {
     }
 }
 
-pub fn update_config(val: Value) -> bool {
-    let data = read_to_string(&*DIPLOJSON);
+pub fn update_config_toml(config: Document) {
+    write(&*DIPLO_CONFIG, config.to_string()).unwrap();
+}
+
+pub fn update_config_json(val: Value) -> bool {
+    let data = read_to_string(&*DIPLO_CONFIG);
     if let Ok(data) = data {
         let mut data: Value = serde_json::from_str(&data).unwrap_or_else(|_| json!({}));
         merge(&mut data, val);
 
-        write(&*DIPLOJSON, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+        write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
         true
     } else {
         error!(
             "No {} file found please create one or run diplo init",
-            &*DIPLOJSON
+            &*DIPLO_CONFIG
         );
         false
     }

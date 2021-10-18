@@ -7,6 +7,7 @@ use watchexec::{
     run::{ExecHandler, Handler, OnBusyUpdate},
 };
 pub fn get_config(command: &str) -> WatchConfig {
+    //Git ignores haven't yet been added so this will have to do;
     let default_ignores = vec![
         format!("**{}.DS_Store", MAIN_SEPARATOR),
         String::from("*.py[co]"),
@@ -57,7 +58,7 @@ impl Handler for DiploHandler {
         // println!("Running manually!");
         self.0.on_manual()
     }
-
+    //A file was edited
     fn on_update(&self, ops: &[PathOp]) -> WatchResult<bool> {
         // println!("Running manually {:?}", ops);
         println!("Noticed file change, restarting");
