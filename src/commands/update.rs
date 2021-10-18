@@ -22,9 +22,8 @@ pub async fn exec() -> Result<()> {
         }
         update_config_toml(document);
     } else if let true = update_config_json(json!({ "dependencies": &newdeps })) {
-            info!("updating done!");
-        }
-    
+        info!("updating done!");
+    }
 
     Ok(())
 }
