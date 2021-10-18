@@ -9,7 +9,7 @@ use serde_json::json;
 use std::{fs::write, process::Command};
 use watchexec::{run::ExecHandler, watch};
 
-pub fn exec(sub_m: Box<&ArgMatches>) -> Result<()> {
+pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(script) = sub_m.value_of("command") {
         let mut extra_args: Vec<String> = vec![];
 

@@ -9,7 +9,7 @@ use diplo::{
 };
 use serde_json::json;
 
-pub async fn exec(sub_m: Box<&ArgMatches>) -> Result<()> {
+pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(module) = sub_m.value_of("module") {
         if sub_m.is_present("std") {
             let latest_std = get_latest_std().await;

@@ -4,7 +4,7 @@ use diplo::{info, term::print_inner, warn, DIPLOJSON};
 use serde_json::json;
 use std::fs::{self};
 
-pub fn exec(sub_m: Box<&ArgMatches>) -> Result<()> {
+pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if fs::File::open(&*DIPLOJSON).is_ok() {
         warn!("THIS WILL RESET YOUR CONFIG");
     }
