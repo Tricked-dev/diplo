@@ -58,7 +58,9 @@ pub fn create_app() -> App<'static> {
                 .arg(
                     Arg::new("module")
                         .about("Deno module you want to add")
-                        .required(true),
+                        .required(true)
+                        .takes_value(true)
+                        .multiple_values(true),
                 )
                 .arg(
                     Arg::new("std")

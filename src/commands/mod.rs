@@ -1,6 +1,6 @@
+use crate::app::create_app;
 use anyhow::Result;
 use clap::ArgMatches;
-use diplo::{error, term::print_inner};
 
 pub async fn handle_match(data: ArgMatches) -> Result<()> {
     match data.subcommand() {
@@ -10,7 +10,7 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
         Some(("install", _)) => install::exec().unwrap(),
         Some(("run", sub_m)) => run::exec(sub_m).unwrap(),
         Some(("update", _)) => update::exec().await.unwrap(),
-        _ => error!("INVALID ARGUMENT USE --help FOR ALL COMMANDS"),
+        _ => create_app().print_long_help().unwrap(),
     };
     Ok(())
 }
