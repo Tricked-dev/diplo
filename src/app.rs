@@ -23,14 +23,24 @@ pub fn create_app() -> App<'static> {
                 ),
         )
         .subcommand(
-            App::new("init").about("Initialize diplo").arg(
-                Arg::new("yes")
-                    .about("Accept all options")
-                    .required(false)
-                    .takes_value(false)
-                    .short('y')
-                    .long("yes"),
-            ),
+            App::new("init")
+                .about("Initialize diplo")
+                .arg(
+                    Arg::new("yes")
+                        .about("Accept all options")
+                        .required(false)
+                        .takes_value(false)
+                        .short('y')
+                        .long("yes"),
+                )
+                .arg(
+                    Arg::new("json")
+                        .about("Create a config using the json format instead of toml")
+                        .required(false)
+                        .takes_value(false)
+                        .short('j')
+                        .long("json"),
+                ),
         )
         .subcommand(App::new("cache").about("Cache the dependencies"))
         .subcommand(

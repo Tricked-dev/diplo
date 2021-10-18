@@ -2,12 +2,14 @@ use anyhow::Result;
 use clap::ArgMatches;
 use diplo::{
     info,
-    load_config::update_config,
+    load_config::{update_config_json, update_config_toml},
     term::print_inner,
     update_deno::{get_latest_std, Versions, HTTP_CLIENT},
-    CONFIG,
+    CONFIG, DIPLO_CONFIG,
 };
 use serde_json::json;
+use std::fs::read_to_string;
+use toml_edit::{value, Document};
 
 pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(modules) = sub_m.values_of("module") {
@@ -19,9 +21,19 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                 let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
                 deps.insert((&module).to_string(), data.to_string());
                 //Errors otherwise
-                if let true = update_config(json!({ "dependencies": deps })) {
-                    info!("Succesfully added {} to the dependencies", data)
-                }
+                if DIPLO_CONFIG.ends_with(".toml") {
+                    //Cant error cause it would default to json
+                    let data = read_to_string(&*DIPLO_CONFIG).unwrap();
+                    let mut document = data.parse::<Document>().unwrap();
+                    for (name, val) in deps.iter() {
+                        document["dependencies"][name] = value(val);
+                    }
+                    update_config_toml(document);
+                    info!("Successfully added {} to the dependencies", data);
+                } else  if let true = update_config_json(json!({ "dependencies": deps })) {
+                        info!("Successfully added {} to the dependencies", data)
+                    }
+                
             } else {
                 let res = HTTP_CLIENT
                     .get(format!(
@@ -42,12 +54,25 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                         format!("https://deno.land/x/{}@{}/mod.ts", module, json.latest),
                     );
                     //Errors otherwise
-                    if let true = update_config(json!({ "dependencies": deps })) {
+                    if DIPLO_CONFIG.ends_with(".toml") {
+                        //Cant error cause it would default to json
+                        let data = read_to_string(&*DIPLO_CONFIG).unwrap();
+                        let mut document = data.parse::<Document>().unwrap();
+                        for (name, val) in deps.iter() {
+                            document["dependencies"][name] = value(val);
+                        }
+                        update_config_toml(document);
                         info!(
-                            "Succesfully added {}@{} to the dependencies",
+                            "Successfully added {}@{} to the dependencies",
                             module, json.latest
                         )
-                    }
+                    } else  if let true = update_config_json(json!({ "dependencies": deps })) {
+                            info!(
+                                "Successfully added {}@{} to the dependencies",
+                                module, json.latest
+                            )
+                        }
+                    
                 } else {
                     info!("No module named {} found", module)
                 }

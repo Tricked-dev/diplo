@@ -23,9 +23,9 @@ pub fn exec() -> Result<()> {
             "cache",
             ".diplo/deps.ts",
             "--quiet",
-            // "--lock=.diplo/deno-lock.json",
-            // "--lock-write",
-            // ".diplo/deno-lock.json",
+            "--lock=.diplo/deno-lock.json",
+            "--lock-write",
+            ".diplo/deno-lock.json",
         ])
         .spawn()
         .unwrap();

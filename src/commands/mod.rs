@@ -1,8 +1,10 @@
 use crate::app::create_app;
 use anyhow::Result;
 use clap::ArgMatches;
+use std::time::Instant;
 
 pub async fn handle_match(data: ArgMatches) -> Result<()> {
+    let started = Instant::now();
     match data.subcommand() {
         Some(("add", sub_m)) => add::exec(sub_m).await.unwrap(),
         Some(("cache", _)) => cache::exec().unwrap(),
@@ -13,6 +15,7 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
         Some(("update", _)) => update::exec().await.unwrap(),
         _ => create_app().print_long_help().unwrap(),
     };
+    println!("Time elapsed {} seconds", started.elapsed().as_secs());
     Ok(())
 }
 
