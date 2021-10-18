@@ -1,20 +1,8 @@
 use anyhow::Result;
 use clap::ArgMatches;
-use diplo::{
-    error, info,
-    load_config::{create_deps, update_config},
-    term::print_inner,
-    update_deno::{get_latest_std, update_deps, Versions, HTTP_CLIENT},
-    warn,
-    watcher::{get_config, DiploHandler},
-    CONFIG, DIPLOJSON, DOTDIPLO,
-};
+use diplo::{info, term::print_inner, warn, DIPLOJSON};
 use serde_json::json;
-use std::{
-    fs::{self, write},
-    process::Command,
-};
-use watchexec::{run::ExecHandler, watch};
+use std::fs::{self};
 
 pub fn exec(sub_m: Box<&ArgMatches>) -> Result<()> {
     if fs::File::open(&*DIPLOJSON).is_ok() {

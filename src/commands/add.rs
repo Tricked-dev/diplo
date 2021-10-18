@@ -1,20 +1,13 @@
 use anyhow::Result;
 use clap::ArgMatches;
 use diplo::{
-    error, info,
-    load_config::{create_deps, update_config},
+    info,
+    load_config::update_config,
     term::print_inner,
-    update_deno::{get_latest_std, update_deps, Versions, HTTP_CLIENT},
-    warn,
-    watcher::{get_config, DiploHandler},
-    CONFIG, DIPLOJSON, DOTDIPLO,
+    update_deno::{get_latest_std, Versions, HTTP_CLIENT},
+    CONFIG,
 };
 use serde_json::json;
-use std::{
-    fs::{self, write},
-    process::Command,
-};
-use watchexec::{run::ExecHandler, watch};
 
 pub async fn exec(sub_m: Box<&ArgMatches>) -> Result<()> {
     if let Some(module) = sub_m.value_of("module") {

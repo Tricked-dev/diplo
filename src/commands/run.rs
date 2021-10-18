@@ -1,19 +1,14 @@
 use anyhow::Result;
 use clap::ArgMatches;
 use diplo::{
-    error, info,
-    load_config::{create_deps, update_config},
+    load_config::create_deps,
     term::print_inner,
-    update_deno::{get_latest_std, update_deps, Versions, HTTP_CLIENT},
     warn,
     watcher::{get_config, DiploHandler},
     CONFIG, DIPLOJSON, DOTDIPLO,
 };
 use serde_json::json;
-use std::{
-    fs::{self, write},
-    process::Command,
-};
+use std::{fs::write, process::Command};
 use watchexec::{run::ExecHandler, watch};
 
 pub fn exec(sub_m: Box<&ArgMatches>) -> Result<()> {

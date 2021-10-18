@@ -1,20 +1,6 @@
 use anyhow::Result;
 use clap::ArgMatches;
-use diplo::{
-    error, info,
-    load_config::{create_deps, update_config},
-    term::print_inner,
-    update_deno::{get_latest_std, update_deps, Versions, HTTP_CLIENT},
-    warn,
-    watcher::{get_config, DiploHandler},
-    CONFIG, DIPLOJSON, DOTDIPLO,
-};
-use serde_json::json;
-use std::{
-    fs::{self, write},
-    process::Command,
-};
-use watchexec::{run::ExecHandler, watch};
+use diplo::{error, term::print_inner};
 
 pub async fn handle_match(data: ArgMatches) -> Result<()> {
     match data.subcommand() {
