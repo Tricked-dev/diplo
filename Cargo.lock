@@ -295,6 +295,7 @@ dependencies = [
  "clap",
  "dotenv",
  "lazy_static",
+ "once_cell",
  "openssl",
  "regex",
  "reqwest",
