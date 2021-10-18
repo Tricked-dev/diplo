@@ -1,6 +1,6 @@
 [package]
 name = "diplo"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2018"
 description = "Diplo is a script runner and dependency manager made in rust"
 authors = ["Tricked-dev"]
@@ -8,6 +8,10 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/Tricked-dev/diplo"
 homepage = "https://tricked.pro/diplo"
+
+[profile.release]
+codegen-units = 1
+lto = true
 
 [package.metadata.deb]
 maintainer = "Tricked-dev"
@@ -46,6 +50,15 @@ termcolor = "1.1.2"
 anyhow = "1.0.44"
 atty = "0.2.14"
 once_cell = "1.8.0"
+toml_edit = "0.6.0"
+toml = "0.5.8"
 
 [target.'cfg(unix)'.dependencies]
 openssl = { version = "0.10.36", features = ["vendored"] }
+
+[features]
+
+
+[[bin]]
+name = "diplo"
+path = "src/bin/diplo.rs"

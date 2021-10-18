@@ -2,7 +2,7 @@
 	<br>
     <img src="assets/diplo_small.svg" width="auto" height="100">
 	<br>
- <p align="center">
+</p>
  
 <!-- # Diplo omit in toc -->
 
@@ -21,7 +21,6 @@
 		- [Updating Dependencies](#updating-dependencies)
 	- [Dotenv Support](#dotenv-support)
 	- [Example Config](#example-config)
-	- [Help menu](#help-menu)
 
 # Installing
 
@@ -44,6 +43,8 @@ $ diplo run <script> --watch
 ## Easy dependencies
 
 Adding a new dependency is as simple as running `diplo add natico` or whatever else you need
+
+Multiple dependencies at once are supported
 
 ```
 $ diplo add natico
@@ -74,6 +75,14 @@ if you want to run the script just do `diplo run start` to run the start script.
 }
 ```
 
+#### Toml <!-- omit in toc -->
+
+```toml
+[scripts]
+start = "deno run -A mod.ts"
+node = "node index.js"
+```
+
 ## Dependencies
 
 Diplo will automatically create a deps.ts file in the .diplo folder if you have dependencies specified in the diplo.json file
@@ -87,13 +96,21 @@ Diplo will automatically create a deps.ts file in the .diplo folder if you have 
 }
 ```
 
+#### Toml <!-- omit in toc -->
+
+```toml
+[dependencies]
+natico= "https://deno.land/x/natico/mod.ts"
+server= "https://deno.land/std@0.110.0/http/server.ts"
+```
+
 ### Updating Dependencies
 
 updating dependencies is a as simple as running `diplo update` note this will only update `deno.land/x/` packages
 
 ```
 $ diplo update
-info: updated discordeno to 12.0.1 from 13.0.1
+info: updated discordeno to 12.0.1 from 11.0.1
 info: updated harmony to v2.2.0 from v1.2.0
 info: updated std to 0.110.0 from 0.10.0
 info: updating done!
@@ -101,7 +118,8 @@ info: updating done!
 
 ### Import Map Support <!-- omit in toc -->
 
-> This will cause type errors in typescript but works perfectly fine with javascript.
+> Typescript users will have to add this to the vscode settings.json (.vscode/settings.json)
+> ![](assets/import_map.png)
 
 ```ts
 import * as server from 'server';
@@ -115,6 +133,12 @@ import * as server from 'server';
 }
 ```
 
+#### Toml <!-- omit in toc -->
+
+```toml
+import_map=true
+```
+
 ## Dotenv Support
 
 Diplo can automatically add environment variables using the rust dotenv module instead of the deno based one
@@ -125,7 +149,16 @@ Diplo can automatically add environment variables using the rust dotenv module i
 }
 ```
 
+#### Toml <!-- omit in toc -->
+
+```toml
+load_env=true
+```
+
 ## Example Config
+
+This is a example of a json config file located at diplo.json.  
+You can also use a toml config file named diplo.toml
 
 ```json
 {
@@ -143,32 +176,6 @@ Diplo can automatically add environment variables using the rust dotenv module i
 		"clear": true
 	}
 }
-```
-
-## Help menu
-
-```
-$ diplo --help
-diplo 0.3.0
-
-Tricked-dev
-
-Diplo is a script runner and dependency manager made in rust
-
-USAGE:
-    diplo [SUBCOMMAND]
-
-FLAGS:
-    -h, --help       Print help information
-    -V, --version    Print version information
-
-SUBCOMMANDS:
-    add        Add a deno.land/x/ module
-    help       Print this message or the help of the given subcommand(s)
-    init       Initialize diplo
-    install    This creates the .diplo directory with all required files
-    run        Run a diplo script
-    update     This updates all deno.land/x/ modules to their latest version
 ```
 
 ## Donating <!-- omit in toc -->

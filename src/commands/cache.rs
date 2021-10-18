@@ -1,7 +1,7 @@
 use crate::{info, load_config::create_deps, term::print_inner, CONFIG, DOTDIPLO};
 use anyhow::Result;
 use serde_json::json;
-use std::fs::write;
+use std::{fs::write, process::Command};
 
 pub fn exec() -> Result<()> {
     if let Some(dependencies) = &CONFIG.dependencies {
@@ -17,7 +17,21 @@ pub fn exec() -> Result<()> {
             }
         }
     }
-    info!("Successfully initialized diplo");
+    let mut out = Command::new("deno")
+        .args(vec![
+            "cache",
+            ".diplo/deps.ts",
+            "--quiet",
+            "--lock=.diplo/deno-lock.json",
+            "--lock-write",
+            ".diplo/deno-lock.json",
+        ])
+        .spawn()
+        .unwrap();
+    if let Err(error) = out.wait() {
+        println!("{}", error);
+    }
+    info!("Successfully cached the dependencies");
 
     Ok(())
 }
