@@ -1,6 +1,5 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{error, term::print_inner, DIPLO_CONFIG, DOTDIPLO};
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use std::{
