@@ -32,6 +32,7 @@ pub fn create_app() -> App<'static> {
                     .long("yes"),
             ),
         )
+        .subcommand(App::new("cache").about("Cache the dependencies"))
         .subcommand(
             App::new("exec")
                 .about("Dynamically run a command")
