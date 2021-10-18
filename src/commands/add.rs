@@ -70,6 +70,11 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                             "Successfully added {}@{} to the dependencies",
                             module, json.latest
                         )
+                    } else if let true = update_config_json(json!({ "dependencies": deps })) {
+                        info!(
+                            "Successfully added {}@{} to the dependencies",
+                            module, json.latest
+                        )
                     }
                 } else {
                     info!("No module named {} found", module)
