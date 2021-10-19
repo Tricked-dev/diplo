@@ -1,6 +1,5 @@
+use crate::{info, load_config::create_deps, term::print_inner, CONFIG, DOTDIPLO};
 use anyhow::Result;
-
-use diplo::{info, load_config::create_deps, term::print_inner, CONFIG, DOTDIPLO};
 use serde_json::json;
 use std::{fs::write, process::Command};
 

@@ -1,12 +1,11 @@
-use anyhow::Result;
-
-use diplo::{
+use crate::{
     info,
     load_config::{update_config_json, update_config_toml},
     term::print_inner,
     update_deno::update_deps,
     CONFIG, DIPLO_CONFIG,
 };
+use anyhow::Result;
 use serde_json::json;
 use std::fs::read_to_string;
 use toml_edit::{value, Document};

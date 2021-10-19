@@ -1,12 +1,12 @@
-use anyhow::Result;
-use clap::ArgMatches;
-use diplo::{
+use crate::{
     info,
     load_config::{update_config_json, update_config_toml},
     term::print_inner,
     update_deno::{get_latest_std, Versions, HTTP_CLIENT},
     CONFIG, DIPLO_CONFIG,
 };
+use anyhow::Result;
+use clap::ArgMatches;
 use serde_json::json;
 use std::fs::read_to_string;
 use toml_edit::{value, Document};
@@ -61,6 +61,11 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                             document["dependencies"][name] = value(val);
                         }
                         update_config_toml(document);
+                        info!(
+                            "Successfully added {}@{} to the dependencies",
+                            module, json.latest
+                        )
+                    } else if let true = update_config_json(json!({ "dependencies": deps })) {
                         info!(
                             "Successfully added {}@{} to the dependencies",
                             module, json.latest

@@ -1,7 +1,4 @@
-mod app;
-mod commands;
-use app::create_app;
-use commands::handle_match;
+use diplo::{app::create_app, commands::handle_match};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

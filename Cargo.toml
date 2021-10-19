@@ -9,6 +9,10 @@ readme = "README.md"
 repository = "https://github.com/Tricked-dev/diplo"
 homepage = "https://tricked.pro/diplo"
 
+[profile.release]
+codegen-units = 1
+lto = true
+
 [package.metadata.deb]
 maintainer = "Tricked-dev"
 copyright = "2021, Tricked-dev"
@@ -53,3 +57,8 @@ toml = "0.5.8"
 openssl = { version = "0.10.36", features = ["vendored"] }
 
 [features]
+
+
+[[bin]]
+name = "diplo"
+path = "src/bin/diplo.rs"

@@ -1,10 +1,10 @@
-use anyhow::Result;
-use clap::ArgMatches;
-use diplo::{
+use crate::{
     load_config::create_deps,
     watcher::{get_config, DiploHandler},
     CONFIG, DOTDIPLO,
 };
+use anyhow::Result;
+use clap::ArgMatches;
 use serde_json::json;
 use std::{fs::write, process::Command};
 use watchexec::{run::ExecHandler, watch};

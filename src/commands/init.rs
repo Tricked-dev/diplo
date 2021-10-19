@@ -1,6 +1,6 @@
+use crate::{info, term::print_inner, warn, DIPLO_CONFIG};
 use anyhow::Result;
 use clap::ArgMatches;
-use diplo::{info, term::print_inner, warn, DIPLO_CONFIG};
 use serde_json::json;
 use std::fs::{self};
 
