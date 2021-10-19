@@ -1,4 +1,5 @@
 use crate::{load_config::WatcherClass, CONFIG};
+use colored::Colorize;
 use std::path::MAIN_SEPARATOR;
 use watchexec::{
     config::{Config as WatchConfig, ConfigBuilder as WatchConfigBuilder},
@@ -6,6 +7,7 @@ use watchexec::{
     pathop::PathOp,
     run::{ExecHandler, Handler, OnBusyUpdate},
 };
+
 pub fn get_config(command: &str) -> WatchConfig {
     //Git ignores haven't yet been added so this will have to do;
     let default_ignores = vec![
@@ -61,7 +63,10 @@ impl Handler for DiploHandler {
     //A file was edited
     fn on_update(&self, ops: &[PathOp]) -> WatchResult<bool> {
         // println!("Running manually {:?}", ops);
-        println!("Noticed file change, restarting");
+        println!(
+            "{} Diplo has noticed a file change, restarting",
+            "[i]".blue()
+        );
         self.0.on_update(ops)
     }
 }

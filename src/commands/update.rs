@@ -1,7 +1,5 @@
 use crate::{
-    info,
     load_config::{update_config_json, update_config_toml},
-    term::print_inner,
     update_deno::update_deps,
     CONFIG, DIPLO_CONFIG,
 };
@@ -21,7 +19,7 @@ pub async fn exec() -> Result<()> {
         }
         update_config_toml(document);
     } else if let true = update_config_json(json!({ "dependencies": &newdeps })) {
-        info!("updating done!");
+        println!("updating done!");
     }
 
     Ok(())

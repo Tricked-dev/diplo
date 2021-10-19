@@ -1,12 +1,11 @@
 use crate::{
     load_config::create_deps,
-    term::print_inner,
-    warn,
     watcher::{get_config, DiploHandler},
     CONFIG, DIPLO_CONFIG, DOTDIPLO,
 };
 use anyhow::Result;
 use clap::ArgMatches;
+use colored::Colorize;
 use serde_json::json;
 use std::{fs::write, process::Command};
 use watchexec::{run::ExecHandler, watch};
@@ -43,6 +42,8 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
 
             let data_2 = data.replace("deno run", &tp);
 
+            println!("Starting script {}", script.yellow());
+            println!("> {}", data.dimmed());
             if sub_m.is_present("watch") {
                 let config = get_config(&data_2);
                 let handler = DiploHandler(ExecHandler::new(config)?);
@@ -63,9 +64,9 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
 
             return Ok(());
         }
-        warn!(
+        println!(
             "Script not found please specify a script from the {} file",
-            &*DIPLO_CONFIG
+            &*DIPLO_CONFIG.red()
         )
     }
     Ok(())

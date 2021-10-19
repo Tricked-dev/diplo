@@ -1,12 +1,12 @@
 use crate::{
-    info,
     load_config::{update_config_json, update_config_toml},
-    term::print_inner,
     update_deno::{get_latest_std, Versions, HTTP_CLIENT},
     CONFIG, DIPLO_CONFIG,
 };
 use anyhow::Result;
 use clap::ArgMatches;
+use colored::Colorize;
+use hyper::body::Buf;
 use serde_json::json;
 use std::fs::read_to_string;
 use toml_edit::{value, Document};
@@ -29,23 +29,24 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                         document["dependencies"][name] = value(val);
                     }
                     update_config_toml(document);
-                    info!("Successfully added {} to the dependencies", data);
+                    println!("Successfully added {} to the dependencies", data.green());
                 } else if let true = update_config_json(json!({ "dependencies": deps })) {
-                    info!("Successfully added {} to the dependencies", data)
+                    println!("Successfully added {} to the dependencies", data.green());
                 }
             } else {
                 let res = HTTP_CLIENT
-                    .get(format!(
-                        "https://cdn.deno.land/{}/meta/versions.json",
-                        &module
-                    ))
-                    .header("user-agent", "diplo")
-                    .send()
+                    .get(
+                        format!("https://cdn.deno.land/{}/meta/versions.json", &module)
+                            .parse()
+                            .unwrap(),
+                    )
                     .await
                     .unwrap();
-                let text = res.text().await.unwrap();
 
-                let json: Result<Versions, serde_json::Error> = serde_json::from_str(&text);
+                let body = hyper::body::aggregate(res).await.unwrap();
+
+                let json: Result<Versions, serde_json::Error> =
+                    serde_json::from_reader(body.reader());
                 if let Ok(json) = json {
                     let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
                     deps.insert(
@@ -61,23 +62,20 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                             document["dependencies"][name] = value(val);
                         }
                         update_config_toml(document);
-                        info!(
+                        println!(
                             "Successfully added {}@{} to the dependencies",
-                            module, json.latest
+                            module.yellow(),
+                            json.latest.yellow()
                         )
                     } else if let true = update_config_json(json!({ "dependencies": deps })) {
-                        info!(
+                        println!(
                             "Successfully added {}@{} to the dependencies",
-                            module, json.latest
-                        )
-                    } else if let true = update_config_json(json!({ "dependencies": deps })) {
-                        info!(
-                            "Successfully added {}@{} to the dependencies",
-                            module, json.latest
+                            module.yellow(),
+                            json.latest.yellow()
                         )
                     }
                 } else {
-                    info!("No module named {} found", module)
+                    println!("No module named {} found", module)
                 }
             }
         }

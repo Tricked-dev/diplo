@@ -1,12 +1,15 @@
-use crate::{info, term::print_inner, warn, DIPLO_CONFIG};
+use crate::DIPLO_CONFIG;
 use anyhow::Result;
 use clap::ArgMatches;
+use colored::Colorize;
 use serde_json::json;
 use std::fs::{self};
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if fs::File::open(&*DIPLO_CONFIG).is_ok() {
-        warn!("THIS WILL RESET YOUR CONFIG");
+        // debug!("{} Already exists", &*DIPLO_CONFIG);
+        let red = "THIS WILL RESET YOUR CONFIG".red();
+        println!("{}", red);
     }
     //json option + yes enabled
     if sub_m.is_present("yes") && sub_m.is_present("json") {
@@ -18,11 +21,11 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
             "scripts": {},
             "watcher": {}
         });
-        info!("Successfully wrote changes to {}", &*DIPLO_CONFIG);
+
         fs::write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
     } else if sub_m.is_present("yes") {
         let data = "name= \"diplo project\"\nload_env=false\nimport_map=false\n[dependencies]\n[scripts]\n[watcher]";
-        info!("Successfully wrote changes to {}", &*DIPLO_CONFIG);
+        println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
         fs::write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
     } else {
         let name = rprompt::prompt_reply_stderr("name : ").unwrap_or_else(|_| "".to_owned());
@@ -49,7 +52,7 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
         } else {
             format!("name= \"{name}\"\nload_env={load_env}\nimport_map={import_map}\n[dependencies]\n[scripts]\n[watcher]",name=name,load_env=load_env, import_map = import_map )
         };
-        info!("Succesfully wrote changes to {}", &*DIPLO_CONFIG);
+        println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
         fs::write(&*DIPLO_CONFIG, data).unwrap();
     }
     Ok(())

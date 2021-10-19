@@ -1,10 +1,12 @@
-use crate::{info, term::print_inner};
 use anyhow::{anyhow, Result};
+use colored::Colorize;
+use hyper::{body::Buf, client::HttpConnector, Client};
+use hyper_tls::HttpsConnector;
 use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
 #[derive(Serialize, Deserialize)]
 pub struct GithubRelease {
     #[serde(rename = "tag_name")]
@@ -18,38 +20,42 @@ pub struct Versions {
 
 lazy_static! {
     //Static http client since creating one on every request isn't performant
-    pub static ref HTTP_CLIENT: reqwest::Client = reqwest::Client::builder()
-        .gzip(true)
-        .brotli(true)
-        .build()
-        .unwrap();
+    pub static ref HTTP_CLIENT: Lazy<Client<HttpsConnector<HttpConnector>>> = Lazy::new(||{
+        let https = HttpsConnector::new();
+     Client::builder().build::<_, hyper::Body>(https)
+    });
     pub static ref PATH: Regex = Regex::new("/(.*).(ts|js)").unwrap();
     pub static ref VERSION: Regex = Regex::new("@(.*)").unwrap();
 }
 
 pub async fn get_latest_x_module(name: &str) -> String {
-    let res = HTTP_CLIENT
-        .get(format!("https://cdn.deno.land/{}/meta/versions.json", name))
-        .header("user-agent", "diplo")
-        .send()
-        .await
+    let url = format!("https://cdn.deno.land/{}/meta/versions.json", name)
+        .parse::<hyper::Uri>()
         .unwrap();
-    let text = res.text().await.unwrap();
 
-    let json: Versions = serde_json::from_str(&text).unwrap();
+    let res = HTTP_CLIENT.get(url).await.unwrap();
+    let body = hyper::body::aggregate(res).await.unwrap();
+
+    // try to parse as json with serde_json
+    let json: Versions = serde_json::from_reader(body.reader()).unwrap();
+
     json.latest
 }
 
 pub async fn get_latest_std() -> String {
     let res = HTTP_CLIENT
-        .get("https://api.github.com/repos/denoland/deno_std/releases/latest")
-        .header("user-agent", "diplo")
-        .send()
+        .get(
+            "https://api.github.com/repos/denoland/deno_std/releases/latest"
+                .parse::<hyper::Uri>()
+                .unwrap(),
+        )
         .await
         .unwrap();
-    let text = res.text().await.unwrap();
+    let body = hyper::body::aggregate(res).await.unwrap();
 
-    let json: GithubRelease = serde_json::from_str(&text).unwrap();
+    // try to parse as json with serde_json
+    let json: GithubRelease = serde_json::from_reader(body.reader()).unwrap();
+
     json.tag_name
 }
 
@@ -67,7 +73,11 @@ pub async fn update_deno_std(val: String) -> Result<String> {
     }
     let latest_std = get_latest_std().await;
     if version != latest_std {
-        info!("updated std to {} from {}", latest_std, version);
+        println!(
+            "updated std to {} from {}",
+            latest_std.bold(),
+            version.bold()
+        );
         Ok(format!(
             "https://deno.land/std@{}{}",
             latest_std,
@@ -93,7 +103,12 @@ pub async fn update_deno_x(val: String) -> Result<String> {
 
     let new_version = get_latest_x_module(&name).await;
     if version != new_version {
-        info!("updated {} to {} from {}", name, new_version, version);
+        println!(
+            "updated {} to {} from {}",
+            name.bold(),
+            new_version.green(),
+            version.red()
+        );
         Ok(format!(
             "https://deno.land/x/{}@{}{}",
             name,
@@ -131,6 +146,7 @@ mod tests {
     use super::update_deps;
     use std::collections::HashMap;
 
+    //It somehow cant reach github api-servers on macos
     #[cfg(not(target_os = "macos"))]
     #[tokio::test]
     async fn update_some_deps() {

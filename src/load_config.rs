@@ -1,6 +1,6 @@
+use crate::{DIPLO_CONFIG, DOTDIPLO};
+use colored::Colorize;
 use serde::{Deserialize, Serialize};
-
-use crate::{error, term::print_inner, DIPLO_CONFIG, DOTDIPLO};
 use serde_json::json;
 use serde_json::Value;
 use std::{
@@ -102,9 +102,9 @@ pub fn update_config_json(val: Value) -> bool {
         write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
         true
     } else {
-        error!(
+        println!(
             "No {} file found please create one or run diplo init",
-            &*DIPLO_CONFIG
+            &*DIPLO_CONFIG.red()
         );
         false
     }

@@ -1,4 +1,4 @@
-use crate::{info, load_config::create_deps, term::print_inner, CONFIG, DOTDIPLO};
+use crate::{load_config::create_deps, CONFIG, DOTDIPLO};
 use anyhow::Result;
 use serde_json::json;
 use std::fs::write;
@@ -17,7 +17,7 @@ pub fn exec() -> Result<()> {
             }
         }
     }
-    info!("Successfully initialized diplo");
+    println!("Successfully initialized diplo");
 
     Ok(())
 }

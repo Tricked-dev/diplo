@@ -1,7 +1,6 @@
 pub mod app;
 pub mod commands;
 pub mod load_config;
-pub mod term;
 pub mod update_deno;
 pub mod watcher;
 use lazy_static::lazy_static;

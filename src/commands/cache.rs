@@ -1,4 +1,4 @@
-use crate::{info, load_config::create_deps, term::print_inner, CONFIG, DOTDIPLO};
+use crate::{load_config::create_deps, CONFIG, DOTDIPLO};
 use anyhow::Result;
 use serde_json::json;
 use std::{fs::write, process::Command};
@@ -31,7 +31,7 @@ pub fn exec() -> Result<()> {
     if let Err(error) = out.wait() {
         println!("{}", error);
     }
-    info!("Successfully cached the dependencies");
+    println!("Successfully cached the dependencies");
 
     Ok(())
 }

@@ -1,7 +1,14 @@
 use crate::app::create_app;
 use anyhow::Result;
 use clap::ArgMatches;
+use colored::Colorize;
+use humantime::format_duration;
+use lazy_static::lazy_static;
 use std::time::Instant;
+lazy_static! {
+    //Regex to replace the extra long formatting > 1ms 997us 241ns
+    static ref REG: regex::Regex = regex::Regex::new("us (.*)ns").unwrap();
+}
 
 pub async fn handle_match(data: ArgMatches) -> Result<()> {
     let started = Instant::now();
@@ -15,7 +22,10 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
         Some(("update", _)) => update::exec().await.unwrap(),
         _ => create_app().print_long_help().unwrap(),
     };
-    println!("Time elapsed {} seconds", started.elapsed().as_secs());
+    let now = Instant::now();
+    let time = format_duration(now.duration_since(started)).to_string();
+    let formatted_date = format!("{}us", REG.replace(&time, ""));
+    println!("{} Done in {}", ">".red(), formatted_date.green());
     Ok(())
 }
 
