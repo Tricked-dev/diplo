@@ -184,6 +184,24 @@ You can also use a toml config file named diplo.toml
 }
 ```
 
+## Screenshots
+
+### Diplo running with watch option on
+
+![](assets/run_start_watch.png)
+
+### Diplo running without watch option
+
+![](assets/run_start.png)
+
+### Updating modules
+
+![](assets/update.png)
+
+### Adding modules
+
+![](assets/add.png)
+
 ## Donating <!-- omit in toc -->
 
 You can support the project by donating to my xmr address `89prBkdG58KU15jv5LTbP3MgdJ2ikrcyu1vmdTKTGEVdhKRvbxgRN671jfFn3Uivk4Er1JXsc1xFZFbmFCGzVZNLPQeEwZc`
