@@ -183,10 +183,12 @@ jobs:
               pkgname=$PROJECT_NAME-$TAG-$platform
               mkdir tmp/$pkgname
               # cp LICENSE README.md tmp/$pkgname
+              [ -f diplo_* ] && mv diplo_* tmp/$pkgname
               mv bins-$platform/$BIN_NAME$exe tmp/$pkgname
               chmod +x tmp/$pkgname/$BIN_NAME$exe
 
               if [ "$exe" = "" ]; then
+                  
                   tar cJf dist/$pkgname.tar.xz -C tmp $pkgname
               else
                   (cd tmp && 7z a -r ../dist/$pkgname.zip $pkgname)
@@ -230,3 +232,20 @@ jobs:
       #     bin.install "<bin-name>"
       #   end
       # end
+
+ publish-cargo:
+    name: Publishing to Cargo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+      - uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty
