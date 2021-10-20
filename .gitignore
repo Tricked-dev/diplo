@@ -3,3 +3,7 @@
 .diplo/*
 diplo.json
 diplo.toml
+/target
+**/*.rs.bk
+wasm-pack.log
+build/

@@ -12,7 +12,7 @@
 
 ##### Documentation [Tricked.pro/diplo](https://tricked.pro/diplo)
 
-- [Installing](#installing)
+- [Installing](#installing) - [windows installer](#windows-installer)
 - [Features](#features)
   - [File watching](#file-watching)
   - [Easy dependencies](#easy-dependencies)
@@ -25,6 +25,12 @@
 # Installing
 
 You can download diplo from the [releases tab](https://github.com/Tricked-dev/diplo/releases) or install it using `cargo install diplo`
+
+### windows installer
+
+```ps
+iwr https://diplo.tricked.pro/installer.ps1 -useb | iex
+```
 
 After that you can run `diplo init` for a interactive setup.  
 or use `diplo init -y` for a one command setup
