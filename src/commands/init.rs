@@ -22,11 +22,11 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
             "watcher": {}
         });
 
-        fs::write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+        fs::write("diplo.json", serde_json::to_string_pretty(&data).unwrap()).unwrap();
     } else if sub_m.is_present("yes") {
-        let data = "name= \"diplo project\"\nload_env=false\nimport_map=false\n[dependencies]\n[scripts]\n[watcher]";
+        let data = "name= \"diplo project\"\nload_env=false\nimport_map=false\n[dependencies]\n[watcher]\n[scripts]";
         println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
-        fs::write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
+        fs::write(&*DIPLO_CONFIG, data).unwrap();
     } else {
         let name = rprompt::prompt_reply_stderr("name : ").unwrap_or_else(|_| "".to_owned());
         let env =
@@ -50,10 +50,15 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
             });
             serde_json::to_string_pretty(&data).unwrap()
         } else {
-            format!("name= \"{name}\"\nload_env={load_env}\nimport_map={import_map}\n[dependencies]\n[scripts]\n[watcher]",name=name,load_env=load_env, import_map = import_map )
+            format!("name= \"{name}\"\nload_env={load_env}\nimport_map={import_map}\n[watcher]\n[dependencies]\n[scripts]",name=name,load_env=load_env, import_map = import_map )
         };
-        println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
-        fs::write(&*DIPLO_CONFIG, data).unwrap();
+        if sub_m.is_present("json") {
+            println!("Successfully wrote changes to {}", "diplo.json".green());
+            fs::write("diplo.json", data).unwrap();
+        } else {
+            println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
+            fs::write(&*DIPLO_CONFIG, data).unwrap();
+        }
     }
     Ok(())
 }

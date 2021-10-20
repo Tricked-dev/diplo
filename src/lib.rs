@@ -29,6 +29,6 @@ fn init_config() -> String {
         unimplemented!("Diplo.yml isn't supported yet!");
         // "diplo.yml".to_owned()
     } else {
-        "diplo.json".to_owned()
+        "diplo.toml".to_owned()
     }
 }

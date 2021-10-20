@@ -17,9 +17,9 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
             if sub_m.is_present("std") {
                 let latest_std = get_latest_std().await;
 
-                let data = &format!("https://deno.land/std@{}/{}/mod.ts", latest_std, module);
+                let std_module = &format!("https://deno.land/std@{}/{}/mod.ts", latest_std, module);
                 let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
-                deps.insert((&module).to_string(), data.to_string());
+                deps.insert((&module).to_string(), std_module.to_string());
                 //Errors otherwise
                 if DIPLO_CONFIG.ends_with(".toml") {
                     //Cant error cause it would default to json
@@ -29,9 +29,15 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                         document["dependencies"][name] = value(val);
                     }
                     update_config_toml(document);
-                    println!("Successfully added {} to the dependencies", data.green());
+                    println!(
+                        "Successfully added {} to the dependencies",
+                        std_module.green()
+                    );
                 } else if let true = update_config_json(json!({ "dependencies": deps })) {
-                    println!("Successfully added {} to the dependencies", data.green());
+                    println!(
+                        "Successfully added {} to the dependencies",
+                        std_module.green()
+                    );
                 }
             } else {
                 let res = HTTP_CLIENT

@@ -2,3 +2,4 @@
 .env
 .diplo/*
 diplo.json
+diplo.toml

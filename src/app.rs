@@ -46,7 +46,13 @@ pub fn create_app() -> App<'static> {
         .subcommand(
             App::new("exec")
                 .about("Dynamically run a command")
-                .arg(Arg::new("command").about("command to run").required(true))
+                .arg(
+                    Arg::new("command")
+                        .about("command to run")
+                        .required(true)
+                        .takes_value(true)
+                        .multiple_values(true),
+                )
                 .arg(
                     Arg::new("watch")
                         .about("Watch the filesystem for changes and restart on changes")

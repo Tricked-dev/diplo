@@ -10,7 +10,7 @@ use std::{fs::write, process::Command};
 use watchexec::{run::ExecHandler, watch};
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
-    if let Some(script) = sub_m.value_of("command") {
+    if let Some(script) = sub_m.values_of("command") {
         let mut extra_args: Vec<String> = vec![];
 
         if let Some(dependencies) = &CONFIG.dependencies {
@@ -37,8 +37,11 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
 
         //Allow inserting the import-map and future things
         tp.push_str(&extra_args.join(" "));
-
-        let data_2 = script.replace("deno run", &tp);
+        // TODO: replace with intersperse once it becomes stable
+        let data_2 = script
+            .collect::<Vec<&str>>()
+            .join(" ")
+            .replace("deno run", &tp);
 
         if sub_m.is_present("watch") {
             let config = get_config(&data_2);
