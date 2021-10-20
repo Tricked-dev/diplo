@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use colored::Colorize;
-use hyper::{body::Buf, client::HttpConnector, Client};
+use hyper::{body::Buf, client::HttpConnector, Body, Client, Method, Request};
 use hyper_tls::HttpsConnector;
 use lazy_static::lazy_static;
 use once_cell::sync::Lazy;
@@ -27,7 +27,7 @@ lazy_static! {
     pub static ref PATH: Regex = Regex::new("/(.*).(ts|js)").unwrap();
     pub static ref VERSION: Regex = Regex::new("@(.*)").unwrap();
 }
-
+///Takes a deno.land/x module and fetches the latest version for it!, only requires a name
 pub async fn get_latest_x_module(name: &str) -> String {
     let url = format!("https://cdn.deno.land/{}/meta/versions.json", name)
         .parse::<hyper::Uri>()
@@ -43,17 +43,18 @@ pub async fn get_latest_x_module(name: &str) -> String {
 }
 
 pub async fn get_latest_std() -> String {
-    let res = HTTP_CLIENT
-        .get(
-            "https://api.github.com/repos/denoland/deno_std/releases/latest"
-                .parse::<hyper::Uri>()
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let req = Request::builder()
+        .method(Method::GET)
+        .uri("https://api.github.com/repos/denoland/deno_std/releases/latest")
+        //Hyper doesn't set a user-agent by default, otherwise github blocks the request
+        .header("user-agent", "diplo/rust")
+        .body(Body::empty())
+        .expect("request builder");
+
+    let res = HTTP_CLIENT.request(req).await.unwrap();
+
     let body = hyper::body::aggregate(res).await.unwrap();
 
-    // try to parse as json with serde_json
     let json: GithubRelease = serde_json::from_reader(body.reader()).unwrap();
 
     json.tag_name
