@@ -6,7 +6,7 @@
  
 <!-- # Diplo omit in toc -->
 
-[![GitHub issues](https://img.shields.io/github/issues/tricked-dev/diplo?style=for-the-badge)](https://github.com/tricked-dev/diplo/issues)[![GitHub license](https://img.shields.io/github/license/Tricked-dev/diplo?style=for-the-badge)](https://github.com/Tricked-dev/diplo/blob/main/LICENSE)[![Crates.io](https://img.shields.io/crates/d/diplo?label=crate%20downloads&style=for-the-badge)](https://crates.io/crates/diplo/)[![GitHub all releases](https://img.shields.io/github/downloads/tricked-dev/diplo/total?label=github%20downloads&style=for-the-badge)](https://github.com/Tricked-dev/diplo/releases/tag/v0.3.1)[![Discord](https://img.shields.io/discord/748956745409232945?logo=discord&style=for-the-badge)](https://discord.gg/mY8zTARu4g)
+[![GitHub issues](https://img.shields.io/github/issues/tricked-dev/diplo?style=for-the-badge)](https://github.com/tricked-dev/diplo/issues)[![GitHub license](https://img.shields.io/github/license/Tricked-dev/diplo?style=for-the-badge)](https://github.com/Tricked-dev/diplo/blob/main/LICENSE)[![Crates.io](https://img.shields.io/crates/d/diplo?label=crate%20downloads&style=for-the-badge)](https://crates.io/crates/diplo/)[![GitHub all releases](https://img.shields.io/github/downloads/tricked-dev/diplo/total?label=github%20downloads&style=for-the-badge)](https://github.com/Tricked-dev/diplo/releases/tag/v0.3.1)[![Discord](https://img.shields.io/discord/748956745409232945?logo=discord&style=for-the-badge)](https://discord.gg/mY8zTARu4g)![Lines of code](https://img.shields.io/tokei/lines/github/tricked-dev/diplo?style=for-the-badge)![GitHub repo size](https://img.shields.io/github/repo-size/tricked-dev/diplo)
 
 ### Diplo is a script runner and dependency manager made in rust mainly for [Deno](https://deno.land/).
 
@@ -14,13 +14,13 @@
 
 - [Installing](#installing)
 - [Features](#features)
-	- [File watching](#file-watching)
-	- [Easy dependencies](#easy-dependencies)
-	- [Script running](#script-running)
-	- [Dependencies](#dependencies)
-		- [Updating Dependencies](#updating-dependencies)
-	- [Dotenv Support](#dotenv-support)
-	- [Example Config](#example-config)
+  - [File watching](#file-watching)
+  - [Easy dependencies](#easy-dependencies)
+  - [Script running](#script-running)
+  - [Dependencies](#dependencies)
+    - [Updating Dependencies](#updating-dependencies)
+  - [Dotenv Support](#dotenv-support)
+  - [Example Config](#example-config)
 
 # Installing
 

@@ -29,6 +29,7 @@ pub struct WatcherClass {
 }
 
 pub fn create_config() -> Config {
+    create_dir_all(&*DOTDIPLO).unwrap();
     let data = read_to_string(&*DIPLO_CONFIG);
 
     let config: Config = match data {
