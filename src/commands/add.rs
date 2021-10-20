@@ -22,17 +22,21 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                 deps.insert((&module).to_string(), std_module.to_string());
                 //Errors otherwise
                 if DIPLO_CONFIG.ends_with(".toml") {
-                    //Cant error cause it would default to json
-                    let data = read_to_string(&*DIPLO_CONFIG).unwrap();
-                    let mut document = data.parse::<Document>().unwrap();
-                    for (name, val) in deps.iter() {
-                        document["dependencies"][name] = value(val);
+                    let data = read_to_string(&*DIPLO_CONFIG);
+                    if let Ok(data) = data {
+                        let mut document = data.parse::<Document>().unwrap();
+                        for (name, val) in deps.iter() {
+                            document["dependencies"][name] = value(val);
+                        }
+                        update_config_toml(document);
+                        println!(
+                            "Successfully added {} to the dependencies",
+                            std_module.green()
+                        );
+                    } else {
+                        println!("Could not locate {}", &*DIPLO_CONFIG);
+                        println!("please initialize diplo with diplo init");
                     }
-                    update_config_toml(document);
-                    println!(
-                        "Successfully added {} to the dependencies",
-                        std_module.green()
-                    );
                 } else if let true = update_config_json(json!({ "dependencies": deps })) {
                     println!(
                         "Successfully added {} to the dependencies",
