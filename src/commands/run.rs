@@ -1,51 +1,23 @@
 use crate::{
-    load_config::create_deps,
+    load_env,
+    run_utils::{append_extra_args, ensure_dependencies, run_script},
     watcher::{get_config, DiploHandler},
-    CONFIG, DIPLO_CONFIG, DOTDIPLO,
+    CONFIG, DIPLO_CONFIG,
 };
 use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
-use serde_json::json;
-use std::{fs::write, process::Command};
 use watchexec::{run::ExecHandler, watch};
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(script) = sub_m.value_of("script") {
-        let mut extra_args: Vec<String> = vec![];
+        let extra_args: Vec<String> = vec![];
 
-        if let Some(dependencies) = &CONFIG.dependencies {
-            create_deps(dependencies);
-            if let Some(import_map) = CONFIG.import_map {
-                if import_map {
-                    let imports = json!({ "imports": dependencies });
-                    write(
-                        format!("{}/import_map.json", &*DOTDIPLO),
-                        serde_json::to_string(&imports)?,
-                    )?;
-                    extra_args.push(format!("--import-map={}/import_map.json", &*DOTDIPLO));
-                }
-            }
-        }
-        if let Some(load_env) = CONFIG.load_env {
-            if load_env {
-                if dotenv::dotenv().is_err() {
-                    println!(
-                        "{}",
-                        format!("no .env file found continuing without loading dotenv").dimmed(),
-                    );
-                }
-            }
-        }
+        ensure_dependencies()?;
+        load_env::load_env(CONFIG.load_env);
 
         if let Some(data) = CONFIG.scripts.as_ref().unwrap().get(script) {
-            let mut tp = String::from("deno run ");
-
-            //Allow inserting the import-map and future things
-            tp.push_str(&extra_args.join(" "));
-
-            let data_2 = data.replace("deno run", &tp);
-
+            let data_2 = append_extra_args(data.to_string(), extra_args);
             println!("Starting script {}", script.yellow());
             println!("> {}", data.dimmed());
             if sub_m.is_present("watch") {
@@ -53,17 +25,7 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
                 let handler = DiploHandler(ExecHandler::new(config)?);
                 watch(&handler)?;
             } else {
-                let mut parts = data_2.trim().split_whitespace();
-
-                let command = parts.next().unwrap();
-
-                let args = parts;
-
-                let mut out = Command::new(command).args(args).spawn()?;
-
-                if let Err(error) = out.wait() {
-                    println!("{}", error);
-                }
+                run_script(data_2)?;
             }
 
             return Ok(());

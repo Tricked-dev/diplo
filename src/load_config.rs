@@ -69,15 +69,6 @@ pub fn create_config() -> Config {
     config
 }
 
-pub fn create_deps(dependencies: &HashMap<String, String>) {
-    create_dir_all(&*DOTDIPLO).unwrap();
-    let mut data: Vec<String> = vec![];
-    for (_, value) in dependencies.iter() {
-        data.push(format!("export * from \"{}\"", value))
-    }
-    write(format!("{}/deps.ts", &*DOTDIPLO), data.join("\n")).unwrap()
-}
-
 pub fn merge(a: &mut Value, b: Value) {
     match (a, b) {
         (a @ &mut Value::Object(_), Value::Object(b)) => {

@@ -2,11 +2,13 @@ pub mod app;
 pub mod commands;
 pub mod load_config;
 pub mod update_deno;
+mod utils;
 pub mod watcher;
 use lazy_static::lazy_static;
 use load_config::{create_config, Config};
 use once_cell::sync::Lazy;
 use std::env;
+use utils::*;
 
 //TODO: use try_exists when released https://github.com/rust-lang/rust/issues/83186
 use std::fs::read;

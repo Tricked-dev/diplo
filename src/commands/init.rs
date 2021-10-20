@@ -7,7 +7,6 @@ use std::fs::{self};
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if fs::File::open(&*DIPLO_CONFIG).is_ok() {
-        // debug!("{} Already exists", &*DIPLO_CONFIG);
         let red = "THIS WILL RESET YOUR CONFIG".red();
         println!("{}", red);
     }

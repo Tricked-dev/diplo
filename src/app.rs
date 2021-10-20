@@ -36,6 +36,7 @@ pub fn create_app() -> App<'static> {
                 .arg(
                     Arg::new("json")
                         .about("Create a config using the json format instead of toml")
+                        .long_about("Create a config using the json format instead of toml\nThis is not recommended to do due to diplo being build with toml in mind")
                         .required(false)
                         .takes_value(false)
                         .short('j')

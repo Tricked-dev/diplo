@@ -1,4 +1,4 @@
-use crate::{load_config::create_deps, CONFIG, DOTDIPLO};
+use crate::{run_utils::create_deps, CONFIG, DOTDIPLO};
 use anyhow::Result;
 use colored::Colorize;
 use serde_json::json;
