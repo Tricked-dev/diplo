@@ -12,8 +12,8 @@ pub async fn exec() -> Result<()> {
     let newdeps = update_deps(CONFIG.dependencies.as_ref().unwrap()).await;
     if DIPLO_CONFIG.ends_with(".toml") {
         //Cant error cause it would default to json
-        let data = read_to_string(&*DIPLO_CONFIG).unwrap();
-        let mut document = data.parse::<Document>().unwrap();
+        let data = read_to_string(&*DIPLO_CONFIG)?;
+        let mut document = data.parse::<Document>()?;
         for (name, val) in newdeps.iter() {
             document["dependencies"][name] = value(val);
         }

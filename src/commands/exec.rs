@@ -5,6 +5,7 @@ use crate::{
 };
 use anyhow::Result;
 use clap::ArgMatches;
+use colored::Colorize;
 use serde_json::json;
 use std::{fs::write, process::Command};
 use watchexec::{run::ExecHandler, watch};
@@ -20,16 +21,20 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
                     let imports = json!({ "imports": dependencies });
                     write(
                         format!("{}/import_map.json", &*DOTDIPLO),
-                        serde_json::to_string(&imports).unwrap(),
-                    )
-                    .unwrap();
+                        serde_json::to_string(&imports)?,
+                    )?;
                     extra_args.push(format!("--import-map={}/import_map.json", &*DOTDIPLO));
                 }
             }
         }
         if let Some(load_env) = CONFIG.load_env {
             if load_env {
-                dotenv::dotenv().expect("COULD NOT FIND .env FILE IN CURRENT DIRECTORY");
+                if dotenv::dotenv().is_err() {
+                    println!(
+                        "{}",
+                        format!("no .env file found continuing without loading dotenv").dimmed(),
+                    );
+                }
             }
         }
 
@@ -54,7 +59,7 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
 
             let args = parts;
 
-            let mut out = Command::new(command).args(args).spawn().unwrap();
+            let mut out = Command::new(command).args(args).spawn()?;
 
             if let Err(error) = out.wait() {
                 println!("{}", error);

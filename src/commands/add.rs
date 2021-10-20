@@ -15,7 +15,7 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(modules) = sub_m.values_of("module") {
         for module in modules {
             if sub_m.is_present("std") {
-                let latest_std = get_latest_std().await;
+                let latest_std = get_latest_std().await?;
 
                 let std_module = &format!("https://deno.land/std@{}/{}/mod.ts", latest_std, module);
                 let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
@@ -24,7 +24,7 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                 if DIPLO_CONFIG.ends_with(".toml") {
                     let data = read_to_string(&*DIPLO_CONFIG);
                     if let Ok(data) = data {
-                        let mut document = data.parse::<Document>().unwrap();
+                        let mut document = data.parse::<Document>()?;
                         for (name, val) in deps.iter() {
                             document["dependencies"][name] = value(val);
                         }
@@ -45,15 +45,11 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                 }
             } else {
                 let res = HTTP_CLIENT
-                    .get(
-                        format!("https://cdn.deno.land/{}/meta/versions.json", &module)
-                            .parse()
-                            .unwrap(),
-                    )
+                    .get(format!("https://cdn.deno.land/{}/meta/versions.json", &module).parse()?)
                     .await
                     .unwrap();
 
-                let body = hyper::body::aggregate(res).await.unwrap();
+                let body = hyper::body::aggregate(res).await?;
 
                 let json: Result<Versions, serde_json::Error> =
                     serde_json::from_reader(body.reader());
@@ -68,7 +64,7 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                         //Cant error cause it would default to json
                         let data = read_to_string(&*DIPLO_CONFIG);
                         if let Ok(data) = data {
-                            let mut document = data.parse::<Document>().unwrap();
+                            let mut document = data.parse::<Document>()?;
                             for (name, val) in deps.iter() {
                                 document["dependencies"][name] = value(val);
                             }

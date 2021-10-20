@@ -3,7 +3,7 @@ use diplo::{app::create_app, commands::handle_match};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = create_app().get_matches();
 
-    handle_match(matches).await.unwrap();
+    handle_match(matches).await?;
 
     Ok(())
 }

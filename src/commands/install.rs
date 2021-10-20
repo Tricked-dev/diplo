@@ -11,9 +11,8 @@ pub fn exec() -> Result<()> {
                 let imports = json!({ "imports": dependencies });
                 write(
                     format!("{}/import_map.json", &*DOTDIPLO),
-                    serde_json::to_string(&imports).unwrap(),
-                )
-                .unwrap();
+                    serde_json::to_string(&imports)?,
+                )?;
             }
         }
     }

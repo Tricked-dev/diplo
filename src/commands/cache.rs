@@ -15,9 +15,8 @@ pub fn exec() -> Result<()> {
                 let imports = json!({ "imports": dependencies });
                 write(
                     format!("{}/import_map.json", &*DOTDIPLO),
-                    serde_json::to_string(&imports).unwrap(),
-                )
-                .unwrap();
+                    serde_json::to_string(&imports)?,
+                )?;
             }
         }
     }
@@ -39,7 +38,7 @@ pub fn exec() -> Result<()> {
     if let Err(out) = out {
         println!("Error occured: {:#?}", out);
         return Ok(());
-    } else if let Err(error) = out.unwrap().wait() {
+    } else if let Err(error) = out?.wait() {
         println!("{:#?}", error);
         return Ok(());
     }

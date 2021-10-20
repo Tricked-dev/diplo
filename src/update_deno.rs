@@ -28,21 +28,21 @@ lazy_static! {
     pub static ref VERSION: Regex = Regex::new("@(.*)").unwrap();
 }
 ///Takes a deno.land/x module and fetches the latest version for it!, only requires a name
-pub async fn get_latest_x_module(name: &str) -> String {
+pub async fn get_latest_x_module(name: &str) -> Result<String> {
     let url = format!("https://cdn.deno.land/{}/meta/versions.json", name)
         .parse::<hyper::Uri>()
         .unwrap();
 
-    let res = HTTP_CLIENT.get(url).await.unwrap();
-    let body = hyper::body::aggregate(res).await.unwrap();
+    let res = HTTP_CLIENT.get(url).await?;
+    let body = hyper::body::aggregate(res).await?;
 
     // try to parse as json with serde_json
-    let json: Versions = serde_json::from_reader(body.reader()).unwrap();
+    let json: Versions = serde_json::from_reader(body.reader())?;
 
-    json.latest
+    Ok(json.latest)
 }
 
-pub async fn get_latest_std() -> String {
+pub async fn get_latest_std() -> Result<String> {
     let req = Request::builder()
         .method(Method::GET)
         .uri("https://api.github.com/repos/denoland/deno_std/releases/latest")
@@ -51,13 +51,13 @@ pub async fn get_latest_std() -> String {
         .body(Body::empty())
         .expect("request builder");
 
-    let res = HTTP_CLIENT.request(req).await.unwrap();
+    let res = HTTP_CLIENT.request(req).await?;
 
-    let body = hyper::body::aggregate(res).await.unwrap();
+    let body = hyper::body::aggregate(res).await?;
 
-    let json: GithubRelease = serde_json::from_reader(body.reader()).unwrap();
+    let json: GithubRelease = serde_json::from_reader(body.reader())?;
 
-    json.tag_name
+    Ok(json.tag_name)
 }
 
 pub async fn update_deno_std(val: String) -> Result<String> {
@@ -72,7 +72,7 @@ pub async fn update_deno_std(val: String) -> Result<String> {
     } else {
         version = "0"
     }
-    let latest_std = get_latest_std().await;
+    let latest_std = get_latest_std().await?;
     if version != latest_std {
         println!(
             "updated std to {} from {}",
@@ -102,7 +102,7 @@ pub async fn update_deno_x(val: String) -> Result<String> {
         version = "0"
     }
 
-    let new_version = get_latest_x_module(&name).await;
+    let new_version = get_latest_x_module(&name).await?;
     if version != new_version {
         println!(
             "updated {} to {} from {}",

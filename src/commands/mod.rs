@@ -10,22 +10,35 @@ lazy_static! {
     static ref REG: regex::Regex = regex::Regex::new("us (.*)ns").unwrap();
 }
 
+fn print_help() -> Result<()> {
+    create_app().print_long_help().unwrap();
+    Ok(())
+}
+
 pub async fn handle_match(data: ArgMatches) -> Result<()> {
     let started = Instant::now();
-    match data.subcommand() {
-        Some(("add", sub_m)) => add::exec(sub_m).await.unwrap(),
-        Some(("cache", _)) => cache::exec().unwrap(),
-        Some(("exec", sub_m)) => exec::exec(sub_m).unwrap(),
-        Some(("init", sub_m)) => init::exec(sub_m).unwrap(),
-        Some(("install", _)) => install::exec().unwrap(),
-        Some(("run", sub_m)) => run::exec(sub_m).unwrap(),
-        Some(("update", _)) => update::exec().await.unwrap(),
-        _ => create_app().print_long_help().unwrap(),
+    let result = match data.subcommand() {
+        Some(("add", sub_m)) => add::exec(sub_m).await,
+        Some(("cache", _)) => cache::exec(),
+        Some(("exec", sub_m)) => exec::exec(sub_m),
+        Some(("init", sub_m)) => init::exec(sub_m),
+        Some(("install", _)) => install::exec(),
+        Some(("run", sub_m)) => run::exec(sub_m),
+        Some(("update", _)) => update::exec().await,
+        _ => print_help(),
     };
-    let now = Instant::now();
-    let time = format_duration(now.duration_since(started)).to_string();
-    let formatted_date = format!("{}us", REG.replace(&time, ""));
-    println!("{} Done in {}", ">".red(), formatted_date.green());
+    if result.is_ok() {
+        let now = Instant::now();
+        let time = format_duration(now.duration_since(started)).to_string();
+        let formatted_date = format!("{}us", REG.replace(&time, ""));
+        println!("{} Done in {}", ">".red(), formatted_date.green());
+    } else if let Err(error) = result {
+        println!("{}", "FATAL ERROR OCCURRED WHILE RUNNING SUBCOMMAND".red());
+        println!("{}", format!("{:?}", error).dimmed());
+        println!("{}", "PLEASE MAKE A ISSUE REPORTING THIS ERROR".red());
+        println!("{}", "https://github.com/Tricked-dev/diplo".bright_red());
+        //TODO: add backtrace - https://github.com/rust-lang/rust/issues/53487
+    }
     Ok(())
 }
 
