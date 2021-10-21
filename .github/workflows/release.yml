@@ -96,15 +96,29 @@ jobs:
             aarch64-linux-gnu-strip \
             /target/${{ matrix.target }}/release/$BIN_NAME
 
-      - name: Build archive
-        shell: bash
-        run: |
-          mkdir dist
-          if [ "${{ matrix.os }}" = "windows-2019" ]; then
-            cp "target/${{ matrix.target }}/release/$BIN_NAME.exe" "dist/"
-          else
-            cp "target/${{ matrix.target }}/release/$BIN_NAME" "dist/"
-          fi
+      - name: Install Wix
+        if: matrix.build == 'x86_64-windows'
+        uses: actions/checkout@v2
+        with:
+          repository: fbarresi/wix
+          path: wix
+      - name: Setup .NET Core
+        if: matrix.build == 'x86_64-windows'
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.101
+      - name: install cargo wix
+        if: matrix.build == 'x86_64-windows'
+        run: cargo install cargo-wix
+      - name: run wix command
+        if: matrix.build == 'x86_64-windows'
+        run: cargo wix init
+      - name: run wix command
+        if: matrix.build == 'x86_64-windows'
+        run: cargo wix
+
+      - name: make dist
+        run: mkdir dist
 
       - name: Run install cargo-deb
         if: matrix.build == 'x86_64-linux'
@@ -112,29 +126,46 @@ jobs:
         with:
           command: install
           args: cargo-deb
+
       - name: Create deb file
         if: matrix.build == 'x86_64-linux'
         run: cargo deb
+
       - name: cp deb file
         if: matrix.build == 'x86_64-linux'
         run: cp target/debian/diplo_* dist/
 
-      # - name: Run install pkgbuild
-      #   if: matrix.build == 'x86_64-linux'
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: install
-      #     args: cargo-pkgbuild
-      # - name: Make pkgbuild
-      #   if: matrix.build == 'x86_64-linux'
-      #   run: cargo pkgbuild
-      # - name: cp pkgbuild
-      #   if: matrix.build == 'x86_64-linux'
-      #   run: mv PKGBUILD dist/
+      - name: Run install pkgbuild
+        if: matrix.build == 'x86_64-linux'
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-pkgbuild
+      - name: Make pkgbuild
+        if: matrix.build == 'x86_64-linux'
+        run: cargo pkgbuild
+      - name: cp pkgbuild
+        if: matrix.build == 'x86_64-linux'
+        run: mv PKGBUILD dist/
+
+      - name: Build archive
+        shell: bash
+        run: |
+
+          if [ "${{ matrix.os }}" = "windows-2019" ]; then
+            ls target
+            ls target/${{ matrix.target }}
+
+
+            cp target/wix/diplo* dist/
+            cp "target/${{ matrix.target }}/release/$BIN_NAME.exe" "dist/"
+          else
+            cp "target/${{ matrix.target }}/release/$BIN_NAME" "dist/"
+          fi
 
       - uses: actions/upload-artifact@v2.2.4
         with:
-          name: bins-${{ matrix.build }}
+          name: diplo-${{ matrix.build }}
           path: dist
 
   publish:
@@ -152,7 +183,7 @@ jobs:
         # with:
         #   path: dist
       # - run: ls -al ./dist
-      - run: ls -al bins-*
+      - run: ls -al diplo-*
 
       - name: Calculate tag name
         run: |
@@ -174,17 +205,22 @@ jobs:
           mkdir dist
 
 
-          for dir in bins-* ; do
-              platform=${dir#"bins-"}
+          for dir in diplo-* ; do
+              platform=${dir#"diplo-"}
               if [[ $platform =~ "windows" ]]; then
                   exe=".exe"
               fi
-
-              pkgname=$PROJECT_NAME-$TAG-$platform
+              ls
+              pkgname=$PROJECT_NAME-$platform
               mkdir tmp/$pkgname
               # cp LICENSE README.md tmp/$pkgname
-              [ -f diplo_* ] && mv diplo_* tmp/$pkgname
-              mv bins-$platform/$BIN_NAME$exe tmp/$pkgname
+
+              [ -f diplo-$platform/diplo-* ] && mv diplo-$platform/diplo-* tmp/$pkgname/
+              [ -f diplo-$platform/diplo_* ] && mv diplo-$platform/diplo_* tmp/$pkgname/
+              [ -f diplo-$platform/diplo-*.msi ] && mv diplo-$platform/*.msi tmp/$pkgname/
+              [ -f diplo-$platform/PKGBUILD ] && mv diplo-$platform/PKGBUILD tmp/$pkgname/
+
+              mv diplo-$platform/$BIN_NAME$exe tmp/$pkgname
               chmod +x tmp/$pkgname/$BIN_NAME$exe
 
               if [ "$exe" = "" ]; then
@@ -209,19 +245,19 @@ jobs:
         run: |
           printf "::set-output name=%s::%s\n" tag-name "${GITHUB_REF#refs/tags/}"
 
-  publish-cargo:
-    name: Publishing to Cargo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - run: |
-          sudo apt-get update
-          sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-      - uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty
+  # publish-cargo:
+  #   name: Publishing to Cargo
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         override: true
+  #     - run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+  #     - uses: actions-rs/cargo@v1
+  #       with:
+  #         command: publish
+  #         args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty
