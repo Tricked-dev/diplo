@@ -3,7 +3,7 @@ use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
 use serde_json::json;
-use std::fs::{self};
+use std::fs;
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if fs::File::open(&*DIPLO_CONFIG).is_ok() {

@@ -1,7 +1,7 @@
 [package]
 name = "diplo"
 version = "0.7.5"
-edition = "2018"
+edition = "2021"
 description = "Diplo is a script runner and dependency manager made in rust"
 authors = ["Tricked-dev"]
 license = "Apache-2.0"
@@ -58,7 +58,7 @@ toml = "0.5.8"
 colored = "2.0.0"
 humantime = "2.1.0"
 hyper-tls = "0.5.0"
-
+ctrlc = "3.2.1"
 
 [target.'cfg(unix)'.dependencies]
 openssl = { version = "0.10.36", features = ["vendored"] }
