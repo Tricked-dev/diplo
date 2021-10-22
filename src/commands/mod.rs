@@ -28,7 +28,8 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
     ctrlc::set_handler(move || {
         print_results();
         process::exit(101)
-    })?;
+    })
+    .unwrap_or_default();
     let result = match data.subcommand() {
         Some(("add", args)) => add::exec(args).await,
         Some(("cache", _)) => cache::exec(),
