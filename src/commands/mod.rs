@@ -21,7 +21,7 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
         let now = Instant::now();
         let time = format_duration(now.duration_since(started)).to_string();
         let formatted_date = format!("{}us", REG.replace(&time, ""));
-        println!("");
+        println!();
         println!("{} Done in {}", ">".red(), formatted_date.green());
     };
 
