@@ -14,7 +14,7 @@ pub fn create_deps(dependencies: &HashMap<String, String>) {
     let exports = CONFIG.exports.as_ref().unwrap_or(&empty_hashmap);
     for (key, value) in dependencies.iter() {
         let export = if let Some(data) = exports.get(key) {
-            if data.contains("*") || data.contains("{") {
+            if data.contains('*') || data.contains('{') {
                 data.to_owned()
             } else {
                 format!("{{ {} }}", data)
