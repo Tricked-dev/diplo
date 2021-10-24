@@ -10,8 +10,19 @@ use std::{
 pub fn create_deps(dependencies: &HashMap<String, String>) {
     create_dir_all(&*DOTDIPLO).unwrap();
     let mut data: Vec<String> = vec![];
-    for (_, value) in dependencies.iter() {
-        data.push(format!("export * from \"{}\"", value))
+    let empty_hashmap = HashMap::new();
+    let exports = CONFIG.exports.as_ref().unwrap_or(&empty_hashmap);
+    for (key, value) in dependencies.iter() {
+        let export = if let Some(data) = exports.get(key) {
+            if data.contains("*") || data.contains("{") {
+                data.to_owned()
+            } else {
+                format!("{{ {} }}", data)
+            }
+        } else {
+            "*".to_owned()
+        };
+        data.push(format!("export {} from \"{}\"", export, value))
     }
     write(format!("{}/deps.ts", &*DOTDIPLO), data.join("\n")).unwrap()
 }

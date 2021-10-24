@@ -81,17 +81,6 @@ You can easily create scripts like you do with npm and yarn
 
 if you want to run the script just do `diplo run start` to run the start script.
 
-```json
-{
-	"scripts": {
-		"start": "deno run -A mod.ts",
-		"node": "node index.js"
-	}
-}
-```
-
-#### Toml <!-- omit in toc -->
-
 ```toml
 [scripts]
 start = "deno run -A mod.ts"
@@ -101,17 +90,6 @@ node = "node index.js"
 ## Dependencies
 
 Diplo will automatically create a deps.ts file in the .diplo folder if you have dependencies specified in the diplo.json file
-
-```json
-{
-	"dependencies": {
-		"natico": "https://deno.land/x/natico/mod.ts",
-		"server": "https://deno.land/std@0.110.0/http/server.ts"
-	}
-}
-```
-
-#### Toml <!-- omit in toc -->
 
 ```toml
 [dependencies]
@@ -142,29 +120,34 @@ import * as server from 'server';
 
 - note Diplo will automatically append `--import-map="./.diplo/import_map.json` after `deno run`.
 
-```json
-{
-	"import_map": true
-}
-```
-
-#### Toml <!-- omit in toc -->
-
 ```toml
 import_map=true
+```
+
+## Exports
+
+Diplo can add custom exports to your dependencies
+
+```toml
+[dependencies]
+natico = "https://deno.land/x/natico@3.0.0/mod.ts"
+doomfetch = "https://deno.land/x/doomfetch@1.0.0/mod.ts"
+[exports]
+natico = "* as natico"
+doomfetch = "default as doomfetch"
+# This would also work doomfetch = "{ default as doomfetch }"
+```
+
+would end up being
+
+```ts
+export { default as doomfetch } from 'https://deno.land/x/doomfetch@1.0.0/mod.ts';
+export * as natico from 'https://deno.land/x/natico@3.0.0/mod.ts';
 ```
 
 ## Dotenv Support
 
 Diplo can automatically add environment variables using the rust dotenv module instead of the deno based one
-
-```json
-{
-	"load_env": true
-}
-```
-
-#### Toml <!-- omit in toc -->
 
 ```toml
 load_env=true
@@ -172,25 +155,23 @@ load_env=true
 
 ## Example Config
 
-This is a example of a json config file located at diplo.json.  
-You can also use a toml config file named diplo.toml
+This is a example of a diplo config.
 
-```json
-{
-	"scripts": {
-		"test": "deno run -A mod.ts",
-		"build": "deno bundle a.ts"
-	},
-	"import_map": false,
-	"load_env": true,
-	"dependencies": {
-		"natico": "https://deno.land/x/natico/mod.ts"
-	},
-	"watcher": {
-		"directory": ".",
-		"clear": true
-	}
-}
+```toml
+name = "diplo project"
+load_env = false
+import_map = false
+[dependencies]
+natico = "https://deno.land/x/natico@3.0.0/mod.ts"
+fs = "https://deno.land/std@0.112.0/fs/mod.ts"
+ws = "https://deno.land/std@0.112.0/ws/mod.ts"
+discordeno = "https://deno.land/x/discordeno@12.0.1/mod.ts"
+[watcher]
+[exports]
+natico = "* as natico"
+[scripts]
+test = "ls -la"
+
 ```
 
 ## Screenshots

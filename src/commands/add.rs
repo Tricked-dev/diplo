@@ -1,6 +1,7 @@
 use crate::{
     load_config::{update_config_json, update_config_toml},
     update_deno::{get_latest_std, Versions, HTTP_CLIENT},
+    utils::run_utils::ensure_dependencies,
     CONFIG, DIPLO_CONFIG,
 };
 use anyhow::Result;
@@ -91,5 +92,6 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
             }
         }
     }
+    ensure_dependencies()?;
     Ok(())
 }

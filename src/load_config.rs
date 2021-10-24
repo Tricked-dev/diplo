@@ -9,13 +9,14 @@ use std::{
 };
 use toml_edit::Document;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Config {
     pub name: Option<String>,
     pub scripts: Option<HashMap<String, String>>,
     pub load_env: Option<bool>,
     pub import_map: Option<bool>,
     pub dependencies: Option<HashMap<String, String>>,
+    pub exports: Option<HashMap<String, String>>,
     pub watcher: Option<WatcherClass>,
 }
 
@@ -47,6 +48,7 @@ pub fn create_config() -> Config {
             load_env: Some(false),
             import_map: Some(false),
             name: None,
+            exports: None,
             scripts: Some(HashMap::new()),
             dependencies: Some(HashMap::new()),
             watcher: None,
