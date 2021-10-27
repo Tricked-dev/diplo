@@ -24,6 +24,7 @@ pub fn create_deps(dependencies: &HashMap<String, String>) {
         };
         data.push(format!("export {} from \"{}\"", export, value))
     }
+    data.sort();
     write(format!("{}/deps.ts", &*DOTDIPLO), data.join("\n")).unwrap()
 }
 
