@@ -130,12 +130,8 @@ Diplo can add custom exports to your dependencies
 
 ```toml
 [dependencies]
-natico = "https://deno.land/x/natico@3.0.0/mod.ts"
-doomfetch = "https://deno.land/x/doomfetch@1.0.0/mod.ts"
-[exports]
-natico = "* as natico"
-doomfetch = "default as doomfetch"
-# This would also work doomfetch = "{ default as doomfetch }"
+natico = {url="https://deno.land/x/natico@3.0.0/mod.ts", exports = "* as natico" }
+doomfetch = {url="https://deno.land/x/doomfetch@1.0.0/mod.ts", exports = "default as doomfetch"
 ```
 
 would end up being
@@ -162,13 +158,11 @@ name = "diplo project"
 load_env = false
 import_map = false
 [dependencies]
-natico = "https://deno.land/x/natico@3.0.0/mod.ts"
+natico = { url="https://deno.land/x/natico@3.0.0/mod.ts", exports = "* as natico" }
 fs = "https://deno.land/std@0.112.0/fs/mod.ts"
 ws = "https://deno.land/std@0.112.0/ws/mod.ts"
 discordeno = "https://deno.land/x/discordeno@12.0.1/mod.ts"
 [watcher]
-[exports]
-natico = "* as natico"
 [scripts]
 test = "ls -la"
 
@@ -194,7 +188,9 @@ test = "ls -la"
 
 ## Donating <!-- omit in toc -->
 
-You can support the project by donating to my xmr address `89prBkdG58KU15jv5LTbP3MgdJ2ikrcyu1vmdTKTGEVdhKRvbxgRN671jfFn3Uivk4Er1JXsc1xFZFbmFCGzVZNLPQeEwZc`
+<img src="https://cryptologos.cc/logos/monero-xmr-logo.png?v=014" alt="" height="15px">`89prBkdG58KU15jv5LTbP3MgdJ2ikrcyu1vmdTKTGEVdhKRvbxgRN671jfFn3Uivk4Er1JXsc1xFZFbmFCGzVZNLPQeEwZc`
+
+<img src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=014" alt="" height="15px">`0xc31a1A5dCd1a4704e81fB7c9C3fa858b9A00C7fb`
 
 ## License <!-- omit in toc -->
 

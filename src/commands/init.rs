@@ -2,7 +2,6 @@ use crate::DIPLO_CONFIG;
 use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
-use serde_json::json;
 use std::fs;
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
@@ -10,20 +9,10 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
         let red = "THIS WILL RESET YOUR CONFIG".red();
         println!("{}", red);
     }
-    //json option + yes enabled
-    if sub_m.is_present("yes") && sub_m.is_present("json") {
-        let data = json!({
-            "name": "diplo-project",
-            "load_env": false,
-            "import_map": false,
-            "dependencies": {},
-            "scripts": {},
-            "watcher": {}
-        });
 
-        fs::write("diplo.json", serde_json::to_string_pretty(&data)?)?;
-    } else if sub_m.is_present("yes") {
-        let data = "name= \"diplo project\"\nload_env=false\nimport_map=false\n[dependencies]\n[exports]\n[watcher]\n[scripts]";
+  
+    if sub_m.is_present("yes") {
+        let data = "name= \"diplo project\"\nload_env=false\nimport_map=false\n[dependencies]\n[watcher]\n[scripts]";
         println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
         fs::write(&*DIPLO_CONFIG, data)?;
     } else {
@@ -38,26 +27,13 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
 
         let import_map = import.contains("true");
 
-        let data = if sub_m.is_present("json") {
-            let data = json!({
-                "name": name,
-                "load_env":load_env,
-                "import_map": import_map,
-                "dependencies": {},
-                "scripts": {},
-                "watcher": {}
-            });
-            serde_json::to_string_pretty(&data)?
-        } else {
-            format!("name= \"{name}\"\nload_env={load_env}\nimport_map={import_map}\n[watcher]\n[exports]\n[dependencies]\n[scripts]",name=name,load_env=load_env, import_map = import_map )
-        };
-        if sub_m.is_present("json") {
-            println!("Successfully wrote changes to {}", "diplo.json".green());
-            fs::write("diplo.json", data)?;
-        } else {
+        let data = 
+            format!("name= \"{name}\"\nload_env={load_env}\nimport_map={import_map}\n[watcher]\n[dependencies]\n[scripts]",name=name,load_env=load_env, import_map = import_map );
+       
+     
             println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
             fs::write(&*DIPLO_CONFIG, data)?;
-        }
+        
     }
     Ok(())
 }

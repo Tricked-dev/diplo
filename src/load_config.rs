@@ -1,5 +1,6 @@
 use crate::{DIPLO_CONFIG, DOTDIPLO};
 use colored::Colorize;
+use openssl::conf;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
@@ -9,14 +10,29 @@ use std::{
 };
 use toml_edit::Document;
 
+#[derive(Serialize, Deserialize, Default, Clone)]
+pub struct Dependency {
+    pub url: String,
+    pub exports: Option<String>,
+}
+
 #[derive(Serialize, Deserialize, Default)]
 pub struct Config {
     pub name: Option<String>,
     pub scripts: Option<HashMap<String, String>>,
     pub load_env: Option<bool>,
     pub import_map: Option<bool>,
-    pub dependencies: Option<HashMap<String, String>>,
-    pub exports: Option<HashMap<String, String>>,
+    pub dependencies: Option<HashMap<String, Dependency>>,
+    pub watcher: Option<WatcherClass>,
+}
+
+#[derive(Serialize, Deserialize, Default)]
+pub struct ConfigParse {
+    pub name: Option<String>,
+    pub scripts: Option<HashMap<String, String>>,
+    pub load_env: Option<bool>,
+    pub import_map: Option<bool>,
+    pub dependencies: Option<HashMap<String, Value>>,
     pub watcher: Option<WatcherClass>,
 }
 
@@ -33,42 +49,51 @@ pub fn create_config() -> Config {
     create_dir_all(&*DOTDIPLO).unwrap();
     let data = read_to_string(&*DIPLO_CONFIG);
 
-    let config: Config = match data {
-        Ok(data) =>
-        //if DIPLO_CONFIG.ends_with(".json")
-        {
-            if DIPLO_CONFIG.ends_with(".toml") {
-                toml::from_str(&data).unwrap()
-            } else {
-                serde_json::from_str(&data).unwrap()
-            }
-        }
-        // serde_json::from_str(&data).unwrap()
-        _ => Config {
+    let config: ConfigParse = match data {
+        Ok(data) => toml::from_str(&data).unwrap(),
+        _ => ConfigParse {
             load_env: Some(false),
             import_map: Some(false),
             name: None,
-            exports: None,
             scripts: Some(HashMap::new()),
             dependencies: Some(HashMap::new()),
             watcher: None,
         },
     };
-
-    // let mut config: Config = Config {
-    //     load_env: Some(false),
-    //     import_map: Some(false),
-    //     name: None,
-    //     scripts: Some(HashMap::new()),
-    //     dependencies: Some(HashMap::new()),
-    //     watcher: None,
-    // };
-
-    // if let Ok(data) = data {
-    //     config = serde_json::from_str(&data).unwrap();
-    // }
-
-    config
+    let mut new_deps: HashMap<String, Dependency> = HashMap::new();
+    if let Some(deps) = config.dependencies {
+        for (key, val) in deps.iter() {
+            if val.is_object() {
+                new_deps.insert(
+                    key.to_string(),
+                    Dependency {
+                        url: val["url"].as_str().unwrap().to_owned(),
+                        exports: if let Some(exports) = val["exports"].as_str() {
+                            Some(exports.to_string())
+                        } else {
+                            None
+                        },
+                    },
+                );
+            } else {
+                new_deps.insert(
+                    key.to_string(),
+                    Dependency {
+                        url: val.as_str().unwrap().to_owned(),
+                        exports: None,
+                    },
+                );
+            }
+        }
+    }
+    Config {
+        name: config.name,
+        scripts: config.scripts,
+        load_env: config.load_env,
+        import_map: config.import_map,
+        dependencies: Some(new_deps),
+        watcher: config.watcher,
+    }
 }
 
 pub fn merge(a: &mut Value, b: Value) {
@@ -85,21 +110,4 @@ pub fn merge(a: &mut Value, b: Value) {
 
 pub fn update_config_toml(config: Document) {
     write(&*DIPLO_CONFIG, config.to_string()).unwrap();
-}
-
-pub fn update_config_json(val: Value) -> bool {
-    let data = read_to_string(&*DIPLO_CONFIG);
-    if let Ok(data) = data {
-        let mut data: Value = serde_json::from_str(&data).unwrap_or_else(|_| json!({}));
-        merge(&mut data, val);
-
-        write(&*DIPLO_CONFIG, serde_json::to_string_pretty(&data).unwrap()).unwrap();
-        true
-    } else {
-        println!(
-            "No {} file found please create one or run diplo init",
-            &*DIPLO_CONFIG.red()
-        );
-        false
-    }
 }

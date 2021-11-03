@@ -1,4 +1,4 @@
-use crate::{CONFIG, DOTDIPLO};
+use crate::{load_config::Dependency, CONFIG, DOTDIPLO};
 use anyhow::Result;
 use serde_json::json;
 use std::{
@@ -7,13 +7,12 @@ use std::{
     process::Command,
 };
 
-pub fn create_deps(dependencies: &HashMap<String, String>) {
+pub fn create_deps(dependencies: &HashMap<String, Dependency>) {
     create_dir_all(&*DOTDIPLO).unwrap();
     let mut data: Vec<String> = vec![];
-    let empty_hashmap = HashMap::new();
-    let exports = CONFIG.exports.as_ref().unwrap_or(&empty_hashmap);
+
     for (key, value) in dependencies.iter() {
-        let export = if let Some(data) = exports.get(key) {
+        let export = if let Some(data) = &value.exports {
             if data.contains('*') || data.contains('{') {
                 data.to_owned()
             } else {
@@ -22,7 +21,7 @@ pub fn create_deps(dependencies: &HashMap<String, String>) {
         } else {
             "*".to_owned()
         };
-        data.push(format!("export {} from \"{}\"", export, value))
+        data.push(format!("export {} from \"{}\"", export, value.url))
     }
     data.sort();
     write(format!("{}/deps.ts", &*DOTDIPLO), data.join("\n")).unwrap()

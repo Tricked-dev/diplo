@@ -7,6 +7,8 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+use crate::load_config::Dependency;
 #[derive(Serialize, Deserialize)]
 pub struct GithubRelease {
     #[serde(rename = "tag_name")]
@@ -121,55 +123,67 @@ pub async fn update_deno_x(val: String) -> Result<String> {
     }
 }
 
-pub async fn update_deps(deps: &HashMap<String, String>) -> HashMap<String, String> {
-    let mut data: HashMap<String, String> = HashMap::new();
+pub async fn update_deps(deps: &HashMap<String, Dependency>) -> HashMap<String, Dependency> {
+    let mut data: HashMap<String, Dependency> = HashMap::new();
     for (key, val) in deps.iter() {
-        data.insert((&key).to_string(), (&val).to_string());
+        let url = val.url.clone();
+        data.insert((&key).to_string(), val.clone());
         //https://cdn.deno.land/natico/meta/versions.json
         //https://cdn.deno.land/natico/versions/3.0.0-rc.1/meta/meta.json
         //https://deno.land/x/natico@3.0.0-rc.1/doc_mod.ts
-        if val.contains("https://deno.land/x/") {
-            if let Ok(result) = update_deno_x(val.to_string()).await {
-                data.insert((&key).to_string(), result);
+        if url.clone().contains("https://deno.land/x/") {
+            if let Ok(result) = update_deno_x(url.clone()).await {
+                data.insert(
+                    (&key).to_string(),
+                    Dependency {
+                        url: result,
+                        exports: val.exports.clone(),
+                    },
+                );
             }
-        }
-        if val.contains("https://deno.land/std") {
-            if let Ok(result) = update_deno_std(val.to_string()).await {
-                data.insert((&key).to_string(), result);
+        } else if val.url.clone().contains("https://deno.land/std") {
+            if let Ok(result) = update_deno_std(url.clone()).await {
+                data.insert(
+                    (&key).to_string(),
+                    Dependency {
+                        url: result,
+                        exports: val.exports.clone(),
+                    },
+                );
             }
         }
     }
     data
 }
 
-#[cfg(test)]
-mod tests {
-    use super::update_deps;
-    use std::collections::HashMap;
+// #[cfg(test)]
+// mod tests {
+//     use super::update_deps;
+//     use std::collections::HashMap;
 
-    //It somehow cant reach github api-servers on macos
-    #[cfg(not(target_os = "macos"))]
-    #[tokio::test]
-    async fn update_some_deps() {
-        let mut deps: HashMap<String, String> = HashMap::new();
+//     //It somehow cant reach github api-servers on macos
+//     #[cfg(not(target_os = "macos"))]
+//     #[tokio::test]
+//     async fn update_some_deps() {
+//         let mut deps: HashMap<String, String> = HashMap::new();
 
-        deps.insert(
-            "natico".to_owned(),
-            "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
-        );
-        deps.insert(
-            "discordeno".to_owned(),
-            "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
-        );
-        deps.insert(
-            "lodash".to_owned(),
-            "https://deno.land/x/lodash@4.17.19/dist/lodash.core.js".to_owned(),
-        );
-        deps.insert(
-            "crypto".to_owned(),
-            "https://deno.land/std@0.111.0/node/crypto.ts".to_owned(),
-        );
+//         deps.insert(
+//             "natico".to_owned(),
+//             "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
+//         );
+//         deps.insert(
+//             "discordeno".to_owned(),
+//             "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
+//         );
+//         deps.insert(
+//             "lodash".to_owned(),
+//             "https://deno.land/x/lodash@4.17.19/dist/lodash.core.js".to_owned(),
+//         );
+//         deps.insert(
+//             "crypto".to_owned(),
+//             "https://deno.land/std@0.111.0/node/crypto.ts".to_owned(),
+//         );
 
-        update_deps(&deps).await;
-    }
-}
+//         update_deps(&deps).await;
+//     }
+// }

@@ -1,5 +1,5 @@
 use crate::{
-    load_config::{update_config_json, update_config_toml},
+    load_config::{update_config_toml, Dependency},
     update_deno::{get_latest_std, Versions, HTTP_CLIENT},
     utils::run_utils::ensure_dependencies,
     CONFIG, DIPLO_CONFIG,
@@ -19,30 +19,21 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                 let latest_std = get_latest_std().await?;
 
                 let std_module = &format!("https://deno.land/std@{}/{}/mod.ts", latest_std, module);
-                let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
-                deps.insert((&module).to_string(), std_module.to_string());
-                //Errors otherwise
-                if DIPLO_CONFIG.ends_with(".toml") {
-                    let data = read_to_string(&*DIPLO_CONFIG);
-                    if let Ok(data) = data {
-                        let mut document = data.parse::<Document>()?;
-                        for (name, val) in deps.iter() {
-                            document["dependencies"][name] = value(val);
-                        }
-                        update_config_toml(document);
-                        println!(
-                            "Successfully added {} to the dependencies",
-                            std_module.green()
-                        );
-                    } else {
-                        println!("Could not locate {}", &*DIPLO_CONFIG);
-                        println!("please initialize diplo with diplo init");
-                    }
-                } else if let true = update_config_json(json!({ "dependencies": deps })) {
+
+                let data = read_to_string(&*DIPLO_CONFIG);
+                if let Ok(data) = data {
+                    let mut document = data.parse::<Document>()?;
+
+                    document["dependencies"][module] = value(std_module.to_string());
+
+                    update_config_toml(document);
                     println!(
                         "Successfully added {} to the dependencies",
                         std_module.green()
                     );
+                } else {
+                    println!("Could not locate {}", &*DIPLO_CONFIG);
+                    println!("please initialize diplo with diplo init");
                 }
             } else {
                 let res = HTTP_CLIENT
@@ -55,36 +46,24 @@ pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
                 let json: Result<Versions, serde_json::Error> =
                     serde_json::from_reader(body.reader());
                 if let Ok(json) = json {
-                    let mut deps = CONFIG.dependencies.as_ref().unwrap().clone();
-                    deps.insert(
-                        (&module).to_string(),
-                        format!("https://deno.land/x/{}@{}/mod.ts", module, json.latest),
-                    );
-                    //Errors otherwise
-                    if DIPLO_CONFIG.ends_with(".toml") {
-                        //Cant error cause it would default to json
-                        let data = read_to_string(&*DIPLO_CONFIG);
-                        if let Ok(data) = data {
-                            let mut document = data.parse::<Document>()?;
-                            for (name, val) in deps.iter() {
-                                document["dependencies"][name] = value(val);
-                            }
-                            update_config_toml(document);
-                            println!(
-                                "Successfully added {}@{} to the dependencies",
-                                module.yellow(),
-                                json.latest.yellow()
-                            )
-                        } else {
-                            println!("Could not locate {}", &*DIPLO_CONFIG);
-                            println!("please initialize diplo with diplo init");
-                        }
-                    } else if let true = update_config_json(json!({ "dependencies": deps })) {
+                    let data = read_to_string(&*DIPLO_CONFIG);
+                    if let Ok(data) = data {
+                        let mut document = data.parse::<Document>()?;
+
+                        document["dependencies"][(&module).to_string()] = value(format!(
+                            "https://deno.land/x/{}@{}/mod.ts",
+                            module, json.latest
+                        ));
+
+                        update_config_toml(document);
                         println!(
                             "Successfully added {}@{} to the dependencies",
                             module.yellow(),
                             json.latest.yellow()
                         )
+                    } else {
+                        println!("Could not locate {}", &*DIPLO_CONFIG);
+                        println!("please initialize diplo with diplo init");
                     }
                 } else {
                     println!("No module named {} found", module)

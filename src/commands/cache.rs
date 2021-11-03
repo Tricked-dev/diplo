@@ -25,23 +25,7 @@ pub fn exec() -> Result<()> {
         println!("{}", format!("{:#?}", e).red());
         return Ok(());
     }
-    let out = Command::new("deno")
-        .args(vec![
-            "cache",
-            &*format!("{}/deps.ts", &*DOTDIPLO),
-            "--quiet",
-            &*format!("--lock={}/deno-lock.json", &*DOTDIPLO),
-            "--lock-write",
-            &*format!("{}/deno-lock.json", &*DOTDIPLO),
-        ])
-        .spawn();
-    if let Err(out) = out {
-        println!("Error occured: {:#?}", out);
-        return Ok(());
-    } else if let Err(error) = out?.wait() {
-        println!("{:#?}", error);
-        return Ok(());
-    }
+
     println!("Successfully cached the dependencies");
 
     Ok(())
