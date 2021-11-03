@@ -1,6 +1,6 @@
 use crate::{load_config::update_config_toml, update_deno::update_deps, CONFIG, DIPLO_CONFIG};
 use anyhow::Result;
-use serde_json::json;
+
 use std::fs::read_to_string;
 use toml_edit::{value, Document};
 

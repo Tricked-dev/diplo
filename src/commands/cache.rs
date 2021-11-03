@@ -4,7 +4,6 @@ use colored::Colorize;
 use serde_json::json;
 use std::{
     fs::{create_dir_all, write},
-    process::Command,
 };
 
 pub fn exec() -> Result<()> {

@@ -1,14 +1,13 @@
 use crate::{
-    load_config::{update_config_toml, Dependency},
+    load_config::{update_config_toml},
     update_deno::{get_latest_std, Versions, HTTP_CLIENT},
-    utils::run_utils::ensure_dependencies,
-    CONFIG, DIPLO_CONFIG,
+    utils::run_utils::ensure_dependencies, DIPLO_CONFIG,
 };
 use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
 use hyper::body::Buf;
-use serde_json::json;
+
 use std::fs::read_to_string;
 use toml_edit::{value, Document};
 

@@ -11,7 +11,7 @@ pub fn create_deps(dependencies: &HashMap<String, Dependency>) {
     create_dir_all(&*DOTDIPLO).unwrap();
     let mut data: Vec<String> = vec![];
 
-    for (key, value) in dependencies.iter() {
+    for (_key, value) in dependencies.iter() {
         let export = if let Some(data) = &value.exports {
             if data.contains('*') || data.contains('{') {
                 data.to_owned()

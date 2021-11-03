@@ -1,8 +1,5 @@
 use crate::{DIPLO_CONFIG, DOTDIPLO};
-use colored::Colorize;
-use openssl::conf;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use serde_json::Value;
 use std::{
     collections::HashMap,
@@ -68,11 +65,7 @@ pub fn create_config() -> Config {
                     key.to_string(),
                     Dependency {
                         url: val["url"].as_str().unwrap().to_owned(),
-                        exports: if let Some(exports) = val["exports"].as_str() {
-                            Some(exports.to_string())
-                        } else {
-                            None
-                        },
+                        exports: val["exports"].as_str().map(|exports| exports.to_string()),
                     },
                 );
             } else {
