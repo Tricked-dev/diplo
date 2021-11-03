@@ -1,8 +1,15 @@
-use crate::{load_config::update_config_toml, update_deno::update_deps, CONFIG, DIPLO_CONFIG};
+use crate::{
+    command_prelude::*, load_config::update_config_toml, update_deno::update_deps, CONFIG,
+    DIPLO_CONFIG,
+};
 use anyhow::Result;
 
 use std::fs::read_to_string;
 use toml_edit::{value, Document};
+
+pub fn cli() -> App<'static> {
+    App::new("update").about("This updates all deno.land/x/ modules to their latest version")
+}
 
 pub async fn exec() -> Result<()> {
     let newdeps = update_deps(CONFIG.dependencies.as_ref().unwrap()).await;

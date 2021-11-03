@@ -1,13 +1,31 @@
 use crate::{
+    command_prelude::*,
     load_env,
     run_utils::{append_extra_args, ensure_dependencies, run_script},
     watcher::{get_config, DiploHandler},
     CONFIG, DIPLO_CONFIG,
 };
 use anyhow::Result;
-use clap::ArgMatches;
 use colored::Colorize;
 use watchexec::{run::ExecHandler, watch};
+
+pub fn cli() -> App<'static> {
+    App::new("run")
+        .about("Run a diplo script")
+        .arg(
+            Arg::new("script")
+                .about("The script to run defined in the diplo.json file")
+                .required(true),
+        )
+        .arg(
+            Arg::new("watch")
+                .about("Watch the filesystem for changes and restart on changes")
+                .required(false)
+                .takes_value(false)
+                .short('w')
+                .long("watch"),
+        )
+}
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(script) = sub_m.value_of("script") {

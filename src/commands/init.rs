@@ -1,8 +1,30 @@
-use crate::DIPLO_CONFIG;
+use crate::{DIPLO_CONFIG,command_prelude::*};
 use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
 use std::fs;
+
+pub fn cli() -> App<'static> {
+    App::new("init")
+                .about("Initialize diplo")
+                .arg(
+                    Arg::new("yes")
+                        .about("Accept all options")
+                        .required(false)
+                        .takes_value(false)
+                        .short('y')
+                        .long("yes"),
+                )
+                .arg(
+                    Arg::new("json")
+                        .about("Create a config using the json format instead of toml")
+                        .long_about("Create a config using the json format instead of toml\nThis is not recommended to do due to diplo being build with toml in mind")
+                        .required(false)
+                        .takes_value(false)
+                        .short('j')
+                        .long("json"),
+                )
+}
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if fs::File::open(&*DIPLO_CONFIG).is_ok() {

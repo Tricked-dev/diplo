@@ -1,10 +1,12 @@
-use crate::{run_utils::create_deps, CONFIG, DOTDIPLO};
+use crate::{command_prelude::*, run_utils::create_deps, CONFIG, DOTDIPLO};
 use anyhow::Result;
 use colored::Colorize;
 use serde_json::json;
-use std::{
-    fs::{create_dir_all, write},
-};
+use std::fs::{create_dir_all, write};
+
+pub fn cli() -> App<'static> {
+    App::new("cache").about("Cache the dependencies")
+}
 
 pub fn exec() -> Result<()> {
     if let Some(dependencies) = &CONFIG.dependencies {

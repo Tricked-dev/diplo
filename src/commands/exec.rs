@@ -1,4 +1,5 @@
 use crate::{
+    command_prelude::*,
     run_utils::{append_extra_args, ensure_dependencies, run_script},
     utils::load_env,
     watcher::{get_config, DiploHandler},
@@ -7,6 +8,26 @@ use crate::{
 use anyhow::Result;
 use clap::ArgMatches;
 use watchexec::{run::ExecHandler, watch};
+
+pub fn cli() -> App<'static> {
+    App::new("exec")
+        .about("Dynamically run a command")
+        .arg(
+            Arg::new("command")
+                .about("command to run")
+                .required(true)
+                .takes_value(true)
+                .multiple_values(true),
+        )
+        .arg(
+            Arg::new("watch")
+                .about("Watch the filesystem for changes and restart on changes")
+                .required(false)
+                .takes_value(false)
+                .short('w')
+                .long("watch"),
+        )
+}
 
 pub fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(script) = sub_m.values_of("command") {

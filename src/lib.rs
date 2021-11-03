@@ -24,3 +24,6 @@ fn init_config() -> String {
         "diplo.toml".to_owned()
     }
 }
+pub mod command_prelude {
+    pub use clap::{App, Arg, ArgMatches};
+}

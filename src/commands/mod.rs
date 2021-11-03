@@ -30,6 +30,7 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
         process::exit(101)
     })
     .unwrap_or_default();
+    //Contributor note - please keep them alphabetically ordered
     let result = match data.subcommand() {
         Some(("add", args)) => add::exec(args).await,
         Some(("cache", _)) => cache::exec(),
@@ -52,10 +53,10 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
     Ok(())
 }
 
-mod add;
-mod cache;
-mod exec;
-mod init;
-mod install;
-mod run;
-mod update;
+pub mod add;
+pub mod cache;
+pub mod exec;
+pub mod init;
+pub mod install;
+pub mod run;
+pub mod update;

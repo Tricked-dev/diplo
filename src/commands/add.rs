@@ -1,15 +1,36 @@
 use crate::{
-    load_config::{update_config_toml},
+    command_prelude::*,
+    load_config::update_config_toml,
     update_deno::{get_latest_std, Versions, HTTP_CLIENT},
-    utils::run_utils::ensure_dependencies, DIPLO_CONFIG,
+    utils::run_utils::ensure_dependencies,
+    DIPLO_CONFIG,
 };
 use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
 use hyper::body::Buf;
-
 use std::fs::read_to_string;
 use toml_edit::{value, Document};
+
+pub fn cli() -> App<'static> {
+    App::new("add")
+        .about("Add a deno.land/x/ module")
+        .arg(
+            Arg::new("module")
+                .about("Deno module you want to add")
+                .required(true)
+                .takes_value(true)
+                .multiple_values(true),
+        )
+        .arg(
+            Arg::new("std")
+                .about("Add a std package")
+                .required(false)
+                .takes_value(false)
+                .short('s')
+                .long("std"),
+        )
+}
 
 pub async fn exec(sub_m: &ArgMatches) -> Result<()> {
     if let Some(modules) = sub_m.values_of("module") {
