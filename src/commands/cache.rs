@@ -1,4 +1,6 @@
-use crate::{command_prelude::*, run_utils::create_deps, CONFIG, DOTDIPLO};
+use crate::{
+    command_prelude::*, run_utils::create_deps, utils::run_utils::get_dep_urls, CONFIG, DOTDIPLO,
+};
 use anyhow::Result;
 use colored::Colorize;
 use serde_json::json;
@@ -13,7 +15,9 @@ pub fn exec() -> Result<()> {
         create_deps(dependencies);
         if let Some(import_map) = CONFIG.import_map {
             if import_map {
-                let imports = json!({ "imports": dependencies });
+                let import_map = get_dep_urls();
+
+                let imports = json!({ "imports": import_map });
                 write(
                     format!("{}/import_map.json", &*DOTDIPLO),
                     serde_json::to_string(&imports)?,

@@ -7,6 +7,17 @@ use std::{
     process::Command,
 };
 
+pub fn get_dep_urls() -> HashMap<String, String> {
+    let mut res = HashMap::new();
+    if let Some(deps) = CONFIG.dependencies.as_ref() {
+        for (key, val) in deps.iter() {
+            res.insert(key.to_owned(), val.url.clone());
+        }
+    }
+
+    res
+}
+
 pub fn create_deps(dependencies: &HashMap<String, Dependency>) {
     create_dir_all(&*DOTDIPLO).unwrap();
     let mut data: Vec<String> = vec![];
@@ -30,15 +41,13 @@ pub fn create_deps(dependencies: &HashMap<String, Dependency>) {
 pub fn ensure_dependencies() -> Result<()> {
     if let Some(dependencies) = &CONFIG.dependencies {
         create_deps(dependencies);
-        if let Some(import_map) = CONFIG.import_map {
-            if import_map {
-                let imports = json!({ "imports": dependencies });
-                write(
-                    format!("{}/import_map.json", &*DOTDIPLO),
-                    serde_json::to_string(&imports)?,
-                )?;
-            }
-        }
+        let import_map = get_dep_urls();
+
+        let imports = json!({ "imports": import_map });
+        write(
+            format!("{}/import_map.json", &*DOTDIPLO),
+            serde_json::to_string(&imports)?,
+        )?;
     }
     Ok(())
 }
