@@ -242,7 +242,7 @@ dependencies = [
 
 [[package]]
 name = "diplo"
-version = "0.8.0"
+version = "0.8.3"
 dependencies = [
  "anyhow",
  "clap",
@@ -253,6 +253,7 @@ dependencies = [
  "hyper",
  "hyper-tls",
  "lazy_static",
+ "libc",
  "once_cell",
  "openssl",
  "regex",
@@ -263,6 +264,7 @@ dependencies = [
  "toml",
  "toml_edit",
  "watchexec",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -660,9 +662,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.104"
+version = "0.2.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b2f96d100e1cf1929e7719b7edb3b90ab5298072638fccd77be9ce942ecdfce"
+checksum = "fbe5e23404da5b4f555ef85ebed98fb4083e55a00c317800bc2a50ede9f3d219"
 
 [[package]]
 name = "log"
@@ -1229,9 +1231,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f690853975602e1bfe1ccbf50504d67174e3bcf340f23b5ea9992e0587a52d8"
+checksum = "e466864e431129c7e0d3476b92f20458e5879919a0596c6472738d9fa2d342f8"
 dependencies = [
  "itoa",
  "ryu",

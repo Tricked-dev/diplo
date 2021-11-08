@@ -1,6 +1,6 @@
 [package]
 name = "diplo"
-version = "0.8.0"
+version = "0.8.3"
 edition = "2021"
 description = "Diplo is a script runner and dependency manager made in rust"
 authors = ["Tricked-dev"]
@@ -40,7 +40,7 @@ clap = "3.0.0-beta.5"
 dotenv = "0.15.0"
 lazy_static = "1.4.0"
 serde = { version = "1.0.130", features = ["derive"] }
-serde_json = "1.0.68"
+serde_json = "1.0.69"
 hyper = { version = "0.14.14", features = [
     "client",
     "http1",
@@ -62,7 +62,10 @@ ctrlc = "3.2.1"
 
 [target.'cfg(unix)'.dependencies]
 openssl = { version = "0.10.38", features = ["vendored"] }
+libc = "0.2.107"
 
+[target.'cfg(windows)'.build-dependencies]
+winapi = "0.3.9"
 
 [features]
 
