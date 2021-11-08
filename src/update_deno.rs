@@ -126,12 +126,12 @@ pub async fn update_deno_x(val: String) -> Result<String> {
 pub async fn update_deps(deps: &HashMap<String, Dependency>) -> HashMap<String, Dependency> {
     let mut data: HashMap<String, Dependency> = HashMap::new();
     for (key, val) in deps.iter() {
-        let url = val.url.clone();
+        let url = &val.url;
         data.insert((&key).to_string(), val.clone());
         //https://cdn.deno.land/natico/meta/versions.json
         //https://cdn.deno.land/natico/versions/3.0.0-rc.1/meta/meta.json
         //https://deno.land/x/natico@3.0.0-rc.1/doc_mod.ts
-        if url.clone().contains("https://deno.land/x/") {
+        if url.contains("https://deno.land/x/") {
             if let Ok(result) = update_deno_x(url.clone()).await {
                 data.insert(
                     (&key).to_string(),
@@ -141,7 +141,7 @@ pub async fn update_deps(deps: &HashMap<String, Dependency>) -> HashMap<String, 
                     },
                 );
             }
-        } else if val.url.clone().contains("https://deno.land/std") {
+        } else if url.contains("https://deno.land/std") {
             if let Ok(result) = update_deno_std(url.clone()).await {
                 data.insert(
                     (&key).to_string(),

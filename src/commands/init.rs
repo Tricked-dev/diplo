@@ -1,4 +1,4 @@
-use crate::{DIPLO_CONFIG,command_prelude::*};
+use crate::{command_prelude::*, DIPLO_CONFIG};
 use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
@@ -32,7 +32,6 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
         println!("{}", red);
     }
 
-  
     if sub_m.is_present("yes") {
         let data = "name= \"diplo project\"\nload_env=false\nimport_map=false\n[dependencies]\n[watcher]\n[scripts]";
         println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
@@ -49,13 +48,11 @@ pub fn exec(sub_m: &ArgMatches) -> Result<()> {
 
         let import_map = import.contains("true");
 
-        let data = 
+        let data =
             format!("name= \"{name}\"\nload_env={load_env}\nimport_map={import_map}\n[watcher]\n[dependencies]\n[scripts]",name=name,load_env=load_env, import_map = import_map );
-       
-     
-            println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
-            fs::write(&*DIPLO_CONFIG, data)?;
-        
+
+        println!("Successfully wrote changes to {}", &*DIPLO_CONFIG.green());
+        fs::write(&*DIPLO_CONFIG, data)?;
     }
     Ok(())
 }
