@@ -11,6 +11,7 @@ use toml_edit::Document;
 pub struct Dependency {
     pub url: String,
     pub exports: Option<String>,
+    pub locked: bool,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -66,6 +67,7 @@ pub fn create_config() -> Config {
                     Dependency {
                         url: val["url"].as_str().unwrap().to_owned(),
                         exports: val["exports"].as_str().map(|exports| exports.to_string()),
+                        locked: val["locked"].as_bool().unwrap_or(false),
                     },
                 );
             } else {
@@ -74,6 +76,7 @@ pub fn create_config() -> Config {
                     Dependency {
                         url: val.as_str().unwrap().to_owned(),
                         exports: None,
+                        locked: false,
                     },
                 );
             }

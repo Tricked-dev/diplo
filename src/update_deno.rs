@@ -131,23 +131,25 @@ pub async fn update_deps(deps: &HashMap<String, Dependency>) -> HashMap<String, 
         //https://cdn.deno.land/natico/meta/versions.json
         //https://cdn.deno.land/natico/versions/3.0.0-rc.1/meta/meta.json
         //https://deno.land/x/natico@3.0.0-rc.1/doc_mod.ts
-        if url.contains("https://deno.land/x/") {
+        if !val.locked && url.contains("https://deno.land/x/") {
             if let Ok(result) = update_deno_x(url.clone()).await {
                 data.insert(
                     (&key).to_string(),
                     Dependency {
                         url: result,
                         exports: val.exports.clone(),
+                        locked: val.locked,
                     },
                 );
             }
-        } else if url.contains("https://deno.land/std") {
+        } else if !val.locked && url.contains("https://deno.land/std") {
             if let Ok(result) = update_deno_std(url.clone()).await {
                 data.insert(
                     (&key).to_string(),
                     Dependency {
                         url: result,
                         exports: val.exports.clone(),
+                        locked: val.locked,
                     },
                 );
             }

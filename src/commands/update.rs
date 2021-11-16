@@ -22,6 +22,11 @@ pub async fn exec() -> Result<()> {
             document["dependencies"][name] = "{}".parse::<toml_edit::Item>().unwrap();
             document["dependencies"][name]["url"] = value(&val.url);
             document["dependencies"][name]["exports"] = value(exports);
+            document["dependencies"][name]["locked"] = value(val.locked);
+        } else if val.locked {
+            document["dependencies"][name] = "{}".parse::<toml_edit::Item>().unwrap();
+            document["dependencies"][name]["url"] = value(&val.url);
+            document["dependencies"][name]["locked"] = value(val.locked);
         } else {
             document["dependencies"][name] = value(&val.url);
         }

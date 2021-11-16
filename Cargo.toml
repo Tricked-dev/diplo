@@ -13,6 +13,7 @@ homepage = "https://tricked.pro/diplo"
 codegen-units = 1
 lto = true
 
+
 [package.metadata.deb]
 maintainer = "Tricked-dev"
 copyright = "2021, Tricked-dev"
