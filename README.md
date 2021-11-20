@@ -1,7 +1,5 @@
 <p align="center" width="200" height="400">
-	<br>
     <img src="assets/diplo_small.svg" width="auto" height="100">
-	<br>
 </p>
  
 <!-- # Diplo omit in toc -->
