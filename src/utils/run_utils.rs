@@ -32,7 +32,16 @@ pub fn create_deps(dependencies: &HashMap<String, Dependency>) {
         } else {
             "*".to_owned()
         };
-        data.push(format!("export {} from \"{}\"", export, value.url))
+        data.push(format!(
+            "{}export {} from \"{}\"",
+            if let Some(types) = &value.types {
+                format!("// @deno-types=\"{}\"\n", types)
+            } else {
+                "".to_owned()
+            },
+            export,
+            value.url
+        ))
     }
     data.sort();
     write(format!("{}/deps.ts", &*DOTDIPLO), data.join("\n")).unwrap()

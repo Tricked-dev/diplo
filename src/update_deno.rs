@@ -138,6 +138,7 @@ pub async fn update_deps(deps: &HashMap<String, Dependency>) -> HashMap<String, 
                     Dependency {
                         url: result,
                         exports: val.exports.clone(),
+                        types: val.types.clone(),
                         locked: val.locked,
                     },
                 );
@@ -150,6 +151,7 @@ pub async fn update_deps(deps: &HashMap<String, Dependency>) -> HashMap<String, 
                         url: result,
                         exports: val.exports.clone(),
                         locked: val.locked,
+                        types: val.types.clone(),
                     },
                 );
             }

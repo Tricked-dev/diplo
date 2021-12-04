@@ -7,3 +7,4 @@ diplo.toml
 **/*.rs.bk
 wasm-pack.log
 build/
+mod.ts

@@ -12,6 +12,8 @@ pub struct Dependency {
     pub url: String,
     pub exports: Option<String>,
     pub locked: bool,
+    ///Types defined by // @deno-types="url"
+    pub types: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -67,6 +69,7 @@ pub fn create_config() -> Config {
                     Dependency {
                         url: val["url"].as_str().unwrap().to_owned(),
                         exports: val["exports"].as_str().map(|exports| exports.to_string()),
+                        types: val["types"].as_str().map(|types| types.to_string()),
                         locked: val["locked"].as_bool().unwrap_or(false),
                     },
                 );
@@ -77,6 +80,7 @@ pub fn create_config() -> Config {
                         url: val.as_str().unwrap().to_owned(),
                         exports: None,
                         locked: false,
+                        types: None,
                     },
                 );
             }
