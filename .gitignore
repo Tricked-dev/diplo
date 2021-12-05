@@ -8,3 +8,4 @@ diplo.toml
 wasm-pack.log
 build/
 mod.ts
+docs/public/**/*

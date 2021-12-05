@@ -22,25 +22,7 @@
 
 # Installing
 
-You can download diplo from the [releases tab](https://github.com/Tricked-dev/diplo/releases) or install it using `cargo install diplo` ( Recommended way since it adds diplo to the path )
-
-### Windows
-
-Theres a .msi installer for diplo in the windows.zip that you can use to install diplo make sure to select the add to path option  
-Theres also a .exe which you can use instead but this requires you to add it to your path manually
-
-### Linux
-
-Theres a .deb file in the linux.tar.gz which you can use to install diplo on debian  
-Theres also a PKGBUILD for archlinux users  
-Theres also a binary in the linux.tar.gz which you can move into your bin folder
-
-### Mac
-
-Theres a binary which you can move to your bin folder
-
-After that you can run `diplo init` for a interactive setup.  
-or use `diplo init -y` for a one command setup
+https://diplo.ascella.wtf/docs/getting-started/installing/
 
 # Features
 
