@@ -8,7 +8,7 @@
 
 ### Diplo is a script runner and dependency manager made in rust mainly for [Deno](https://deno.land/).
 
-##### Documentation [Tricked.pro/diplo](https://tricked.pro/diplo)
+##### Documentation [diplo.ascella.wtf](https://diplo.ascella.wtf/)
 
 - [Installing](#installing) - [windows installer](#windows-installer)
 - [Features](#features)
