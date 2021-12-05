@@ -17,13 +17,13 @@ top = false
 
 Simple starter guide for diplo [Quick Start →](../quick-start/)
 
-## Go further
+<!-- ## Go further
 
 Contributing and Help.
 
 ## Contributing
 
-Find out how to contribute to Doks. [Contributing →](../../contributing/how-to-contribute/)
+Find out how to contribute to Doks. [Contributing →](../../contributing/how-to-contribute/) -->
 
 <!-- ## Help
 
