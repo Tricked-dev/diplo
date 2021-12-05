@@ -20,6 +20,14 @@ pub fn cli() -> App<'static> {
                 .multiple_values(true),
         )
         .arg(
+            Arg::new("load env")
+                .about("Load the environment values using the rust dotenv crate")
+                .required(false)
+                .takes_value(false)
+                .short('e')
+                .long("load_env"),
+        )
+        .arg(
             Arg::new("watch")
                 .about("Watch the filesystem for changes and restart on changes")
                 .required(false)

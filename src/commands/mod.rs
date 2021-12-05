@@ -1,4 +1,5 @@
 use crate::app::create_app;
+use crate::load_env::load_env;
 use anyhow::Result;
 use clap::ArgMatches;
 use colored::Colorize;
@@ -30,6 +31,9 @@ pub async fn handle_match(data: ArgMatches) -> Result<()> {
         process::exit(101)
     })
     .unwrap_or_default();
+
+    load_env(Some(data.is_present("load_env")));
+
     //Contributor note - please keep them alphabetically ordered
     let result = match data.subcommand() {
         Some(("add", args)) => add::exec(args).await,
