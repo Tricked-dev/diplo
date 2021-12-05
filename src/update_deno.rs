@@ -159,35 +159,3 @@ pub async fn update_deps(deps: &HashMap<String, Dependency>) -> HashMap<String, 
     }
     data
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::update_deps;
-//     use std::collections::HashMap;
-
-//     //It somehow cant reach github api-servers on macos
-//     #[cfg(not(target_os = "macos"))]
-//     #[tokio::test]
-//     async fn update_some_deps() {
-//         let mut deps: HashMap<String, String> = HashMap::new();
-
-//         deps.insert(
-//             "natico".to_owned(),
-//             "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
-//         );
-//         deps.insert(
-//             "discordeno".to_owned(),
-//             "https://deno.land/x/natico@2.3.0-rc.2/mod.ts".to_owned(),
-//         );
-//         deps.insert(
-//             "lodash".to_owned(),
-//             "https://deno.land/x/lodash@4.17.19/dist/lodash.core.js".to_owned(),
-//         );
-//         deps.insert(
-//             "crypto".to_owned(),
-//             "https://deno.land/std@0.111.0/node/crypto.ts".to_owned(),
-//         );
-
-//         update_deps(&deps).await;
-//     }
-// }
