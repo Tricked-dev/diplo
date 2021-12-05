@@ -1,6 +1,6 @@
 [package]
 name = "diplo"
-version = "0.8.4"
+version = "1.0.0"
 edition = "2021"
 description = "Diplo is a script runner and dependency manager made in rust"
 authors = ["Tricked-dev"]
