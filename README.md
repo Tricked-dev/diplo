@@ -1,32 +1,35 @@
-<p align="center" width="200" height="400">
-    <img src="assets/diplo_small.svg" width="auto" height="100">
+<h1 align="center">
+  <br>
+  <a href="http://diplo.ascella.wtf/"><img src="assets/diplo.png" alt="Markdownify" width="200"></a>
+  <br>
+  Diplo
+  <br>
+</h1>
+
+<h4 align="center">A fast dependency manager and script runner for <a href="https://deno.land/" target="_blank">Deno</a>.</h4>
+
+---
+
+<p align="center">
+<a href="https://github.com/tricked-dev/diplo/issues"><img src="https://img.shields.io/github/issues/tricked-dev/diplo" alt="GitHub issues"></a><a href="https://github.com/Tricked-dev/diplo/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Tricked-dev/diplo" alt="GitHub license"></a><a href="https://crates.io/crates/diplo/"><img src="https://img.shields.io/crates/d/diplo?label=crate%20downloads" alt="Crates.io"></a><a href="https://github.com/Tricked-dev/diplo/releases/tag/v0.3.1"><img src="https://img.shields.io/github/downloads/tricked-dev/diplo/total?label=github%20downloads" alt="GitHub all releases"></a><a href="https://discord.gg/mY8zTARu4g"><img src="https://img.shields.io/discord/748956745409232945?logo=discord&" alt="Discord"></a>
+
 </p>
- 
-<!-- # Diplo omit in toc -->
+<p align="center">
+    <a href="https://diplo.ascella.wtf/docs/getting-started/installing/">Installing</a> •
+    <a href="https://diplo.ascella.wtf/docs/getting-started/quick-start/">Usage</a> •
+    <a href="https://diplo.ascella.wtf/docs/getting-started/features/">Features</a> 
+</p>
 
-[![GitHub issues](https://img.shields.io/github/issues/tricked-dev/diplo?style=for-the-badge)](https://github.com/tricked-dev/diplo/issues)[![GitHub license](https://img.shields.io/github/license/Tricked-dev/diplo?style=for-the-badge)](https://github.com/Tricked-dev/diplo/blob/main/LICENSE)[![Crates.io](https://img.shields.io/crates/d/diplo?label=crate%20downloads&style=for-the-badge)](https://crates.io/crates/diplo/)[![GitHub all releases](https://img.shields.io/github/downloads/tricked-dev/diplo/total?label=github%20downloads&style=for-the-badge)](https://github.com/Tricked-dev/diplo/releases/tag/v0.3.1)[![Discord](https://img.shields.io/discord/748956745409232945?logo=discord&style=for-the-badge)](https://discord.gg/mY8zTARu4g)![Lines of code](https://img.shields.io/tokei/lines/github/tricked-dev/diplo?style=for-the-badge)![GitHub repo size](https://img.shields.io/github/repo-size/tricked-dev/diplo?style=for-the-badge)
+## Key Features
 
-### Diplo is a script runner and dependency manager made in rust mainly for [Deno](https://deno.land/).
+- Script running
+  - Diplo has simple and easy to use script running capabilities
+- Dependency management
+  - Diplo manages dependencies by defining them in the diplo.toml file
+- Dependency updating diplo can update all your dependencies using `diplo update`
+- import maps Diplo creates import maps from your dependencies
 
-##### Documentation [diplo.ascella.wtf](https://diplo.ascella.wtf/)
-
-- [Installing](#installing)
-- [Features](#features)
-  - [Screenshots](#screenshots)
-    - [Diplo running with watch option on](#diplo-running-with-watch-option-on)
-    - [Diplo running without watch option](#diplo-running-without-watch-option)
-    - [Updating modules](#updating-modules)
-    - [Adding modules](#adding-modules)
-
-# Installing
-
-Guide on how to install Diplo can be found here https://diplo.ascella.wtf/docs/getting-started/installing/
-
-# Features
-
-You can find the features Diplo has here https://diplo.ascella.wtf/docs/getting-started/features/
-
-## Screenshots
+### Screenshots
 
 ### Diplo running with watch option on
 
@@ -44,12 +47,16 @@ You can find the features Diplo has here https://diplo.ascella.wtf/docs/getting-
 
 ![](assets/add.png)
 
-## Donating <!-- omit in toc -->
+## Donating
 
-<img src="https://cryptologos.cc/logos/monero-xmr-logo.png?v=014" alt="" height="15px">`89prBkdG58KU15jv5LTbP3MgdJ2ikrcyu1vmdTKTGEVdhKRvbxgRN671jfFn3Uivk4Er1JXsc1xFZFbmFCGzVZNLPQeEwZc`
+<img src="https://tricked.pro/crypto/monero-xmr-logo.png" alt="" height="15px">`89prBkdG58KU15jv5LTbP3MgdJ2ikrcyu1vmdTKTGEVdhKRvbxgRN671jfFn3Uivk4Er1JXsc1xFZFbmFCGzVZNLPQeEwZc`
 
-<img src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=014" alt="" height="15px">`0xc31a1A5dCd1a4704e81fB7c9C3fa858b9A00C7fb`
+<img src="https://tricked.pro/crypto/ethereum-eth-logo.png" alt="" height="15px">`0xc31a1A5dCd1a4704e81fB7c9C3fa858b9A00C7fb`
 
-## License <!-- omit in toc -->
+<img src="https://tricked.pro/crypto/bitcoin-cash-bch-logo.png" alt="" height="15px">`qz9gyruyyvtwcmevtcnyru8gudenqjqeug096e459m`
 
-This project is licensed under the terms of the [Apache License 2.0](./LICENSE)
+## License
+
+Apache-2
+
+---
