@@ -16,4 +16,4 @@ top = false
 
 ## Contact the creator?
 
-- [Tricked.pro](https://tricked.rpr)
+- [Tricked.pro](https://tricked.pro)
