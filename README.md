@@ -29,23 +29,16 @@
 - Dependency updating diplo can update all your dependencies using `diplo update`
 - import maps Diplo creates import maps from your dependencies
 
-### Screenshots
+## Screenshots
 
-### Diplo running with watch option on
-
-![](assets/run_start_watch.png)
-
-### Diplo running without watch option
-
-![](assets/run_start.png)
-
-### Updating modules
-
-![](assets/update.png)
-
-### Adding modules
-
-![](assets/add.png)
+| name                               | screenshot                      |
+| ---------------------------------- | ------------------------------- |
+| Diplo running with watch option on | ![](assets/run_start_watch.png) |
+| Diplo running without watch option | ![](assets/run_start.png)       |
+| Updating modules                   | ![](assets/update.png)          |
+| Adding modules                     | ![](assets/add.png)             |
+| Init                               | ![](assets/init.png)            |
+| Exec                               | ![](assets/exec.png)            |
 
 ## Donating
 
