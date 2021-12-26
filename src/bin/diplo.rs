@@ -1,10 +1,21 @@
+use diplo::commands::run_default;
 use diplo::{app::create_app, commands::handle_match};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let matches = create_app().get_matches();
+    let app = create_app();
+    let matches = app.get_matches();
 
-    handle_match(matches).await?;
+    if matches.subcommand_name().is_some()
+        && create_app()
+            .find_subcommand(matches.subcommand_name().unwrap())
+            .is_none()
+    {
+        println!("test");
+        run_default()?;
+    } else {
+        handle_match(matches).await?;
+    }
 
     Ok(())
 }

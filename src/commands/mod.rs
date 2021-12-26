@@ -16,6 +16,38 @@ fn print_help() -> Result<()> {
     Ok(())
 }
 
+pub fn run_default() -> Result<()> {
+    let data = &run::cli().get_matches();
+    let started = Instant::now();
+    let print_results = move || {
+        let now = Instant::now();
+        let time = format_duration(now.duration_since(started)).to_string();
+        let formatted_date = format!("{}us", REG.replace(&time, ""));
+        println!();
+        println!("{} Done in {}", ">".red(), formatted_date.green());
+    };
+
+    ctrlc::set_handler(move || {
+        print_results();
+        process::exit(101)
+    })
+    .unwrap_or_default();
+
+    load_env(Some(data.is_present("load_env")));
+
+    let result = run::exec(data);
+
+    if result.is_ok() {
+        print_results()
+    } else if let Err(error) = result {
+        println!("{}", "FATAL ERROR OCCURRED WHILE RUNNING SUBCOMMAND".red());
+        println!("{}", format!("{:?}", error).dimmed());
+        println!("{}", "PLEASE MAKE A ISSUE REPORTING THIS ERROR".red());
+        println!("{}", "https://github.com/Tricked-dev/diplo".bright_red());
+    }
+    Ok(())
+}
+
 pub async fn handle_match(data: ArgMatches) -> Result<()> {
     let started = Instant::now();
     let print_results = move || {

@@ -9,7 +9,7 @@ pub fn cli() -> App<'static> {
                 .about("Initialize diplo")
                 .arg(
                     Arg::new("yes")
-                        .about("Accept all options")
+                        .help("Accept all options")
                         .required(false)
                         .takes_value(false)
                         .short('y')
@@ -17,8 +17,8 @@ pub fn cli() -> App<'static> {
                 )
                 .arg(
                     Arg::new("json")
-                        .about("Create a config using the json format instead of toml")
-                        .long_about("Create a config using the json format instead of toml\nThis is not recommended to do due to diplo being build with toml in mind")
+                        .help("Create a config using the json format instead of toml")
+                        .long_help("Create a config using the json format instead of toml\nThis is not recommended to do due to diplo being build with toml in mind")
                         .required(false)
                         .takes_value(false)
                         .short('j')

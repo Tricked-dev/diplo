@@ -14,12 +14,12 @@ pub fn cli() -> App<'static> {
         .about("Run a diplo script")
         .arg(
             Arg::new("script")
-                .about("The script to run defined in the diplo.json file")
+                .help("The script to run defined in the diplo.json file")
                 .required(true),
         )
         .arg(
             Arg::new("load env")
-                .about("Load the environment values using the rust dotenv crate")
+                .help("Load the environment values using the rust dotenv crate")
                 .required(false)
                 .takes_value(false)
                 .short('e')
@@ -27,7 +27,7 @@ pub fn cli() -> App<'static> {
         )
         .arg(
             Arg::new("watch")
-                .about("Watch the filesystem for changes and restart on changes")
+                .help("Watch the filesystem for changes and restart on changes")
                 .required(false)
                 .takes_value(false)
                 .short('w')

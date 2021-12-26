@@ -14,14 +14,14 @@ pub fn cli() -> App<'static> {
         .about("Dynamically run a command")
         .arg(
             Arg::new("command")
-                .about("command to run")
+                .help("command to run")
                 .required(true)
                 .takes_value(true)
                 .multiple_values(true),
         )
         .arg(
             Arg::new("load env")
-                .about("Load the environment values using the rust dotenv crate")
+                .help("Load the environment values using the rust dotenv crate")
                 .required(false)
                 .takes_value(false)
                 .short('e')
@@ -29,7 +29,7 @@ pub fn cli() -> App<'static> {
         )
         .arg(
             Arg::new("watch")
-                .about("Watch the filesystem for changes and restart on changes")
+                .help("Watch the filesystem for changes and restart on changes")
                 .required(false)
                 .takes_value(false)
                 .short('w')

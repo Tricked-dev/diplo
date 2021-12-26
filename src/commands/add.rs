@@ -17,14 +17,14 @@ pub fn cli() -> App<'static> {
         .about("Add a deno.land/x/ module")
         .arg(
             Arg::new("module")
-                .about("Deno module you want to add")
+                .help("Deno module you want to add")
                 .required(true)
                 .takes_value(true)
                 .multiple_values(true),
         )
         .arg(
             Arg::new("std")
-                .about("Add a std package")
+                .help("Add a std package")
                 .required(false)
                 .takes_value(false)
                 .short('s')
